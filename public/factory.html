@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>内容变现工厂 🏭</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#0c0c18;color:#e2e2f0;overflow-x:hidden}
+.sidebar{width:210px;background:rgba(255,255,255,0.03);border-right:1px solid rgba(255,255,255,0.06);height:100vh;position:sticky;top:0;overflow-y:auto;flex-shrink:0}
+.main{flex:1;overflow-y:auto;height:100vh}
+.card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:14px}
+.card-warm{background:rgba(249,115,22,0.07);border:1px solid rgba(249,115,22,0.25)}
+.card-sel{background:rgba(249,115,22,0.12)!important;border-color:rgba(249,115,22,0.5)!important}
+.hover-card{transition:all .2s;cursor:pointer}
+.hover-card:hover{background:rgba(255,255,255,0.08);transform:translateY(-2px);border-color:rgba(255,255,255,0.18)}
+input,textarea,select{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);color:#e2e2f0;border-radius:10px;padding:10px 14px;font-family:inherit;font-size:14px;width:100%;transition:border .2s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,0.15)}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,0.25)}
+option{background:#1a1a30}
+textarea{resize:vertical;line-height:1.7}
+.btn{border:none;border-radius:11px;padding:11px 22px;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,#f97316,#ef4444);color:#fff}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(249,115,22,0.4)}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+.btn-ghost{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);color:#ccc}
+.btn-ghost:hover{background:rgba(255,255,255,0.12);color:#fff}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:9px;cursor:pointer;font-size:13px;color:#8888aa;margin:2px 6px;border-left:3px solid transparent;transition:all .15s}
+.nav-item:hover{background:rgba(255,255,255,0.05);color:#ddd}
+.nav-item.active{background:rgba(249,115,22,0.13);color:#f97316;border-left-color:#f97316;font-weight:600}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
+.t-or{background:rgba(249,115,22,0.2);color:#fb923c}
+.t-gr{background:rgba(34,197,94,0.18);color:#4ade80}
+.t-pu{background:rgba(168,85,247,0.2);color:#c084fc}
+.t-bl{background:rgba(59,130,246,0.2);color:#60a5fa}
+.t-pk{background:rgba(236,72,153,0.2);color:#f472b6}
+.t-cy{background:rgba(6,182,212,0.2);color:#22d3ee}
+.cost-pill{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#4ade80;padding:3px 10px;border-radius:7px;font-size:11px;font-weight:700}
+.gtext{background:linear-gradient(135deg,#f97316,#ec4899,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.gtext-w{background:linear-gradient(135deg,#fbbf24,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.output-area{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px;white-space:pre-wrap;line-height:1.85;font-size:13.5px;color:#d4d4e0;min-height:100px}
+.typing::after{content:'▋';animation:blink 0.9s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.plat-xhs{background:rgba(255,35,68,0.12);color:#ff6b6b;border:1px solid rgba(255,35,68,0.25)}
+.plat-gzh{background:rgba(7,193,96,0.1);color:#4ade80;border:1px solid rgba(7,193,96,0.25)}
+.plat-sph{background:rgba(22,119,255,0.1);color:#60a5fa;border:1px solid rgba(22,119,255,0.25)}
+.plat-dy{background:rgba(254,44,85,0.1);color:#f472b6;border:1px solid rgba(254,44,85,0.25)}
+.plat-yt{background:rgba(255,0,0,0.1);color:#f87171;border:1px solid rgba(255,0,0,0.2)}
+.plat{padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.04em}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(249,115,22,0.3);border-radius:2px}
+.chat-bubble-ai{background:rgba(255,255,255,0.07);border-radius:0 14px 14px 14px;padding:12px 16px;max-width:85%;font-size:14px;line-height:1.7}
+.chat-bubble-user{background:rgba(249,115,22,0.15);border-radius:14px 0 14px 14px;padding:12px 16px;max-width:85%;font-size:14px;line-height:1.7;margin-left:auto}
+.step-circle{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.sc-done{background:#22c55e;color:#fff}
+.sc-active{background:#f97316;color:#fff}
+.sc-todo{background:rgba(255,255,255,0.1);color:#666}
+.divider{height:1px;background:rgba(255,255,255,0.07);margin:16px 0}
+.stat-big{font-size:26px;font-weight:800;line-height:1}
+.section-title{font-size:20px;font-weight:800;margin-bottom:4px}
+.section-sub{color:#8888aa;font-size:13px;margin-bottom:20px}
+.persona-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.profession-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.api-cost-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.api-cost-row:last-child{border:none}
+.radio-card{border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s;border:2px solid transparent}
+.radio-card:hover{border-color:rgba(249,115,22,0.3)}
+.radio-card.sel{border-color:#f97316;background:rgba(249,115,22,0.1)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback,useMemo}=React;
+
+/* ── storage ── */
+const LS={
+  g:(k,d=null)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},
+  s:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+};
+
+/* ── AI provider endpoints ── */
+const AI_ENDPOINTS={
+  deepseek:'https://api.deepseek.com/v1/chat/completions',
+  moonshot:'https://api.moonshot.cn/v1/chat/completions',
+  zhipu:'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+  qwen:'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+  doubao:'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
+};
+
+/* 从 apiKeys 提取当前激活的 provider 配置 */
+function getAI(apiKeys){
+  const p=apiKeys?.provider||'zhipu';
+  const map={
+    deepseek:{provider:'deepseek',key:apiKeys?.deepseek,model:apiKeys?.deepseekModel||'deepseek-chat'},
+    moonshot:{provider:'moonshot',key:apiKeys?.moonshot,model:apiKeys?.moonshotModel||'moonshot-v1-8k'},
+    zhipu:{provider:'zhipu',key:apiKeys?.zhipu,model:apiKeys?.zhipuModel||'glm-4-flash'},
+    qwen:{provider:'qwen',key:apiKeys?.qwen,model:apiKeys?.qwenModel||'qwen-turbo'},
+    doubao:{provider:'doubao',key:apiKeys?.doubao,model:apiKeys?.doubaoModel||'doubao-pro-32k'},
+    claude:{provider:'claude',key:apiKeys?.claude,model:apiKeys?.claudeModel||'claude-haiku-4-5-20251001'},
+  };
+  return map[p]||map.zhipu;
+}
+
+/* ── 统一流式 AI 调用（支持 Claude 和所有国内 OpenAI 兼容 API）── */
+async function streamAI(cfg,sys,user,onChunk){
+  const{provider,key,model}=cfg;
+  if(!key)throw new Error('请先在「API设置」配置 API Key');
+  const r=await fetch('/api/proxy',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({provider,apiKey:key,model,system:sys,user})
+  });
+  if(!r.ok){
+    let msg='API错误 '+r.status;
+    try{const err=await r.json();msg=err.error||msg;}catch{}
+    throw new Error(msg);
+  }
+  const reader=r.body.getReader(),dec=new TextDecoder();let full='',buf='';
+  while(true){
+    const{done,value}=await reader.read();if(done)break;
+    buf+=dec.decode(value);
+    const lines=buf.split('\n');buf=lines.pop()||'';
+    for(const l of lines){
+      if(!l.startsWith('data: '))continue;
+      const raw=l.slice(6).trim();
+      if(!raw||raw==='[DONE]')continue;
+      try{
+        const d=JSON.parse(raw);
+        const text=d.delta?.text||d.choices?.[0]?.delta?.content;
+        if(text){full+=text;if(onChunk)onChunk(full);}
+      }catch{}
+    }
+  }
+  return full;
+}
+
+/* ══════════════════════════════════════════════════
+   DATA: PROFESSIONS & PRESETS
+══════════════════════════════════════════════════ */
+const PROFESSIONS=[
+  /* 内容创作方向 */
+  {cat:'📱 内容创作',items:[
+    {id:'fuye',e:'🚀',n:'副业导师',h:'帮普通人找到第一条收入线',tags:['副业','赚钱','兼职'],plats:['小红书','公众号','视频号']},
+    {id:'mama',e:'🌸',n:'宝妈博主',h:'带娃赚钱两不误',tags:['宝妈','育儿','居家'],plats:['小红书','视频号']},
+    {id:'ai_tools',e:'🤖',n:'AI工具达人',h:'帮你找最好用最省钱的AI工具',tags:['AI','效率','科技'],plats:['小红书','公众号','抖音']},
+    {id:'finance',e:'💰',n:'理财博主',h:'用最简单的方式，让钱帮你赚钱',tags:['理财','财务自由'],plats:['公众号','小红书']},
+    {id:'save',e:'🛒',n:'省钱达人',h:'同样生活花的钱只有你的一半',tags:['省钱','薅羊毛','消费'],plats:['小红书','抖音']},
+    {id:'psych',e:'🧠',n:'心理成长',h:'用心理学帮你活得更清醒',tags:['心理','情绪','成长'],plats:['公众号','小红书','视频号']},
+    {id:'food',e:'🍜',n:'美食博主',h:'好吃的我替你找到了',tags:['美食','探店','食谱'],plats:['小红书','抖音','视频号']},
+    {id:'fashion',e:'👗',n:'时尚穿搭',h:'让普通人也穿出自己的风格',tags:['穿搭','时尚','好物'],plats:['小红书','抖音']},
+    {id:'fitness',e:'💪',n:'健身博主',h:'科学健身，不走弯路',tags:['健身','减脂','运动'],plats:['抖音','视频号','小红书']},
+    {id:'travel',e:'✈️',n:'旅行博主',h:'帮你把旅行成本砍一半',tags:['旅行','攻略','省钱'],plats:['小红书','抖音']},
+    {id:'pet',e:'🐾',n:'宠物博主',h:'铲屎官的日常与省钱经',tags:['宠物','养猫','养狗'],plats:['小红书','抖音']},
+    {id:'study',e:'📚',n:'学习博主',h:'真正高效的学习方法',tags:['学习','考研','技能'],plats:['公众号','小红书','B站']},
+  ]},
+  /* 职业人士 */
+  {cat:'💼 职业人士',items:[
+    {id:'insurance',e:'🛡️',n:'保险代理人',h:'帮你看懂保险、买对保险',tags:['保险','理财','保障'],plats:['公众号','视频号','小红书']},
+    {id:'fin_plan',e:'📊',n:'财务规划师',h:'帮你规划人生每一分钱',tags:['财务规划','理财','税务'],plats:['公众号','视频号']},
+    {id:'clothing',e:'👔',n:'服装销售',h:'让你每件衣服都穿值了',tags:['服装','穿搭','好物'],plats:['抖音','视频号','小红书']},
+    {id:'food_biz',e:'🍳',n:'餐饮老板',h:'餐饮人的经营干货',tags:['餐饮','创业','经营'],plats:['视频号','抖音','公众号']},
+    {id:'teacher',e:'👩‍🏫',n:'老师/培训师',h:'让学习真正发生',tags:['教育','培训','课程'],plats:['公众号','视频号']},
+    {id:'doctor',e:'👨‍⚕️',n:'医生/健康顾问',h:'用科普帮你做对健康决策',tags:['健康','医疗','养生'],plats:['公众号','小红书','视频号']},
+    {id:'lawyer',e:'⚖️',n:'律师/法律顾问',h:'让法律不再难懂',tags:['法律','合同','权益'],plats:['公众号','视频号']},
+    {id:'dev',e:'💻',n:'程序员/开发者',h:'技术人的副业与成长',tags:['编程','AI','副业'],plats:['公众号','B站','小红书']},
+    {id:'designer',e:'🎨',n:'设计师',h:'用设计眼光帮你变美变好',tags:['设计','审美','创意'],plats:['小红书','抖音']},
+    {id:'realestate',e:'🏠',n:'房产中介',h:'买房卖房的坑我替你踩过了',tags:['房产','买房','投资'],plats:['视频号','公众号','抖音']},
+    {id:'hr',e:'🤝',n:'HR/招聘专家',h:'求职面试那些事，我最懂',tags:['求职','职场','面试'],plats:['公众号','小红书']},
+    {id:'startup',e:'⚡',n:'创业者',h:'创业路上的真实经历',tags:['创业','商业','运营'],plats:['公众号','视频号','小红书']},
+  ]},
+  /* 生活方式 */
+  {cat:'🌟 生活方式',items:[
+    {id:'baby',e:'🍼',n:'母婴博主',h:'给宝宝最好的，但不乱花钱',tags:['母婴','育儿','好物'],plats:['小红书','视频号']},
+    {id:'diy',e:'🔨',n:'手工/DIY',h:'用双手创造有价值的东西',tags:['手工','DIY','创意'],plats:['小红书','抖音']},
+    {id:'car',e:'🚗',n:'汽车博主',h:'买车用车的真实体验',tags:['汽车','用车','测评'],plats:['抖音','视频号']},
+    {id:'digital',e:'📱',n:'数码测评',h:'帮你花对每一分数码预算',tags:['数码','测评','科技'],plats:['B站','抖音','小红书']},
+    {id:'virtual_product',e:'📦',n:'虚拟产品卖家',h:'0成本数字产品月入过万，小红书最快变现路径',tags:['虚拟产品','数字产品','小红书'],plats:['小红书']},
+    {id:'ai_service',e:'🎯',n:'AI定制服务',h:'用AI帮人做PPT/视频/剧本，时薪轻松过千',tags:['AI服务','定制','副业'],plats:['小红书','公众号']},
+    {id:'custom',e:'✨',n:'我有自己的想法',h:'完全自定义我的人设',tags:[],plats:[]},
+  ]},
+];
+
+/* API工具完整数据 */
+const API_CATALOG=[
+  {id:'claude',name:'Claude（Anthropic）',cat:'✍️ 文字生成',domestic:false,emoji:'🤖',required:true,
+   models:[
+     {id:'claude-haiku-4-5-20251001',n:'Haiku 4.5 ⚡最快',cin:0.25,cout:1.25,note:'10篇约¥0.18'},
+     {id:'claude-sonnet-4-6',n:'Sonnet 4.6 ✨推荐',cin:3,cout:15,note:'10篇约¥2'},
+     {id:'claude-opus-4-6',n:'Opus 4.6 💎最强',cin:15,cout:75,note:'10篇约¥10'},
+   ],
+   getUrl:'https://console.anthropic.com',keyLabel:'Anthropic API Key',keyPh:'sk-ant-api03-...',
+   tip:'文字内容生产的核心，必须配置'},
+  {id:'jimeng',name:'即梦AI（字节/豆包）',cat:'🎨 AI图片',domestic:true,emoji:'🎨',
+   models:[
+     {id:'jimeng_std',n:'标准版',cin:0,cout:0.04,note:'每张¥0.04'},
+     {id:'jimeng_pro',n:'高清版',cin:0,cout:0.08,note:'每张¥0.08'},
+   ],
+   getUrl:'https://jimeng.jianying.com',keyLabel:'火山引擎 API Key',keyPh:'ak-...',
+   tip:'国内最便宜，无需翻墙，效果很好'},
+  {id:'midjourney',name:'Midjourney',cat:'🎨 AI图片',domestic:false,emoji:'🖼️',
+   models:[
+     {id:'mj_v6',n:'MJ v6',cin:0,cout:0.12,note:'每张约¥0.12'},
+     {id:'mj_v7',n:'MJ v7（最新）',cin:0,cout:0.15,note:'每张约¥0.15'},
+   ],
+   getUrl:'https://piapi.ai',keyLabel:'API Key（通过 piapi.ai）',keyPh:'your-key',
+   tip:'效果业界最好，需要翻墙，适合要求高的图片'},
+  {id:'flux',name:'Flux（Replicate）',cat:'🎨 AI图片',domestic:false,emoji:'⚡',
+   models:[
+     {id:'flux_schnell',n:'Flux Schnell ⚡',cin:0,cout:0.015,note:'每张约¥0.10'},
+     {id:'flux_dev',n:'Flux Dev',cin:0,cout:0.03,note:'每张约¥0.22'},
+     {id:'flux_pro',n:'Flux Pro 1.1',cin:0,cout:0.04,note:'每张约¥0.29'},
+   ],
+   getUrl:'https://replicate.com',keyLabel:'Replicate API Token',keyPh:'r8_...',
+   tip:'速度超快，性价比极高'},
+  {id:'kling',name:'可灵AI（快手）',cat:'🎬 AI视频',domestic:true,emoji:'🎬',
+   models:[
+     {id:'kling_5s',n:'5秒视频·标准',cin:0,cout:0.35,note:'每次¥0.35'},
+     {id:'kling_10s',n:'10秒视频·专业',cin:0,cout:1.4,note:'每次¥1.4'},
+   ],
+   getUrl:'https://klingai.com',keyLabel:'可灵 API Key',keyPh:'your-kling-key',
+   tip:'国内最好的AI视频，支持图生视频'},
+  {id:'runway',name:'Runway（Gen-3）',cat:'🎬 AI视频',domestic:false,emoji:'🎥',
+   models:[
+     {id:'runway_g3',n:'Gen-3 Alpha',cin:0,cout:0.05,note:'每秒$0.05（约¥0.36）'},
+   ],
+   getUrl:'https://runwayml.com',keyLabel:'Runway API Key',keyPh:'your-runway-key',
+   tip:'视频质量顶级，适合高端内容'},
+  {id:'suno',name:'Suno（AI音乐）',cat:'🎵 AI音乐',domestic:false,emoji:'🎵',
+   models:[{id:'suno_v4',n:'Suno v4',cin:0,cout:0.008,note:'每首约¥0.06'}],
+   getUrl:'https://suno.com/api',keyLabel:'Suno API Key',keyPh:'your-suno-key',
+   tip:'AI音乐生成最好用的工具'},
+  {id:'tiangong',name:'天工音乐（昆仑）',cat:'🎵 AI音乐',domestic:true,emoji:'🎶',
+   models:[{id:'tg_std',n:'天工标准',cin:0,cout:0.05,note:'每首约¥0.05'}],
+   getUrl:'https://music.tiangong.cn',keyLabel:'天工 API Key',keyPh:'your-tiangong-key',
+   tip:'中文歌词优化最好，国内有免费额度'},
+  {id:'yimei',name:'易媒助手',cat:'📡 内容分发',domestic:true,emoji:'📡',
+   models:[{id:'ym_std',n:'标准版',cin:0,cout:0,note:'月费¥99-299'}],
+   getUrl:'https://ymt365.com',keyLabel:'易媒助手 API',keyPh:'your-yimei-key',
+   tip:'一键发布70+平台，新手首选'},
+  {id:'xinred',name:'新红数据',cat:'📊 数据分析',domestic:true,emoji:'📊',
+   models:[{id:'xr_api',n:'API版',cin:0,cout:0,note:'月费¥299起'}],
+   getUrl:'https://xh.newrank.cn',keyLabel:'新红 API Key',keyPh:'your-xinred-key',
+   tip:'小红书数据最专业'},
+];
+
+/* 内容类型 */
+const CONTENT_TYPES=[
+  {id:'xhs',name:'小红书图文',plat:'小红书',icon:'📕',
+   sys:'你是爆款小红书内容创作专家。写内容要真实自然，有人情味，像真人写的，不要模板腔。',
+   build:(p,t,h)=>`你是「${p.tagline||p.name}」，${p.style}。为目标用户（${p.target}）写小红书图文。
+选题：${t}
+${h?'重要：去AI感处理——加入1个真实小细节，用口语，偶尔省略号停顿，首段用"我"开头。':''}
+
+输出：
+【5个备选标题】分别用：🔢数字型 / 🔄反常识 / 📊对比型 / ❓问题型 / 📖故事型
+【正文】800-1200字，分段，有emoji，口语化，结构：钩子→共鸣→干货→行动
+【5张配图描述】（简洁描述画面）
+【10个标签】#话题格式
+【互动引导语】最后一句`},
+  {id:'gzh',name:'公众号文章',plat:'公众号',icon:'💬',
+   sys:'你是资深公众号写手，写长文深度兼具，有个人风格，不要官方腔。',
+   build:(p,t,h)=>`你是「${p.tagline||p.name}」，${p.style}。写一篇公众号文章。
+选题：${t}
+${h?'去AI感：加个人经历/案例，口语化，自问自答，偶尔用破折号——停顿。':''}
+要求：2000-3000字，开头30字内抓住人，3-5个小节有标题，结尾行动引导。`},
+  {id:'video',name:'短视频口播脚本',plat:'视频号',icon:'🎬',
+   sys:'你是短视频脚本创作者，节奏感强，每句话都有存在价值。',
+   build:(p,t,h)=>`你是「${p.tagline||p.name}」，${p.style}。写3分钟口播脚本。
+主题：${t}
+${h?'去AI感：加口头禅，允许不完整句，像真人说话，标注（停顿）（语气加重）。':''}
+结构：【钩子0-15秒】【铺垫15-45秒】【干货3个点各30秒】【结尾30秒引导】`},
+  {id:'live',name:'直播话术',plat:'视频号',icon:'📱',
+   sys:'你是直播话术专家，能写出有感染力又自然的话术。',
+   build:(p,t,h)=>`为「${p.tagline||p.name}」写2小时直播话术框架。
+主题/产品：${t}
+时间轴：【0-10min暖场】【10-40min干货建信任】【40-50min引流品】【50-80min干货升华】【80-100min主推品锁单】【100-120min答疑收尾】
+每段写具体话术，真实自然。`},
+  {id:'topic30',name:'30个选题生成',plat:'通用',icon:'💡',
+   sys:'你是内容选题策划专家，只输出JSON数组。',
+   build:(p,t)=>`为「${p.tagline||p.name}」（目标用户：${p.target}）生成30个${t||'小红书'}平台爆款选题。
+每个格式：{"title":"标题","type":"收藏型/转发型/评论型","potential":"高/中","hook":"开场第一句","why":"爆款原因"}
+只输出JSON数组。`},
+  {id:'names',name:'账号起名（8个方案）',plat:'通用',icon:'📛',
+   sys:'你是起名专家，帮内容创作者起有记忆点的账号名。',
+   build:(p)=>`为「${p.tagline||p.name}」（${p.style}）起8个账号名，目标用户：${p.target}。
+分4组各2个：【搜索流量型】【记忆点型】【专业信任型】【亲切温度型】
+每个名字附一句说明。`},
+  {id:'bio',name:'个人简介（3版）',plat:'通用',icon:'✍️',
+   sys:'你是文案策划专家，写bio要简洁有力有钩子。',
+   build:(p)=>`为「${p.tagline||p.name}」写3版账号简介。
+定位：${p.tagline}，目标用户：${p.target}，钩子：${p.hook||''}，产品：${p.products||''}
+【简洁版】25字内 【标准版】50字 【详细版】100字
+要求：真实自然，有价值主张，有行动引导。`},
+  {id:'comment',name:'评论区话术（20条）',plat:'通用',icon:'💬',
+   sys:'你是社群运营专家，写评论回复要像真人随口说的。',
+   build:(p,t)=>`为「${p.tagline||p.name}」写20条评论区回复话术，方向：${t||p.tags?.join('、')||'通用'}。
+分类：【感谢类5条】【转化类5条-引导私信关注】【答疑类5条】【共鸣类5条】
+每条都不同，像真人随口回复，不要模板感。`},
+  {id:'virtual',name:'虚拟产品文案',plat:'小红书',icon:'📦',
+   sys:'你是小红书虚拟产品销售专家，写文案要突出稀缺感和价值感，像真人测评，不要广告腔。',
+   build:(p,t,h)=>`你是「${p.tagline||p.name}」，写一篇小红书虚拟产品销售笔记。
+产品/方向：${t}
+${h?'去AI感：加真实使用场景，用"我亲测"开头，允许有小情绪，结尾留悬念引私信。':''}
+输出：
+【爆款标题3个】（含具体数字/结果）
+【正文800字】结构：我的痛点→发现这个→亲测效果→具体内容（截图/数据描述）→限时价格
+【引导话术】最后3句引导私信或加购
+【配图描述】4张图的拍摄思路`},
+  {id:'shangdan',name:'接商单内容',plat:'小红书',icon:'🤝',
+   sys:'你是小红书商单达人，写种草内容要真实自然，广告感要淡到用户看不出来。',
+   build:(p,t,h)=>`你是「${p.tagline||p.name}」，写一篇小红书商单种草笔记。
+品牌/产品：${t}
+${h?'去AI感：融入真实使用场景，第一人称测评，加一个"小缺点"显真实，结尾自然引导。':''}
+输出：
+【5个标题】（从日常场景切入，不带广告感）
+【正文900字】：先讲自己的使用场景→自然带出产品→具体好用的点（3个）→一个小不足让你更可信→结尾引导
+【配图方案】5张图拍摄建议
+【话题标签】8个`},
+  {id:'youtube',name:'YouTube AI视频脚本',plat:'YouTube',icon:'▶️',
+   sys:'你是YouTube中文内容创作者，擅长写能让海外华人看懂、有收益的AI主题视频。',
+   build:(p,t,h)=>`你是「${p.tagline||p.name}」，写一个YouTube中文视频脚本。
+主题：${t}
+${h?'去AI感：用轻松口语，允许适当的英文夹杂，加"你们很多人问我"类引导，自然不正式。':''}
+结构：【Hook前15秒：一句话引出核心价值】【自我介绍5秒】【正片内容3-5段含时间戳】【CTA结尾：订阅+评论】
+要求：全程口播，有节奏感，适合剪辑，总时长目标8-12分钟`},
+];
+
+const PLAT_STYLE={'小红书':'plat-xhs','公众号':'plat-gzh','视频号':'plat-sph','抖音':'plat-dy','YouTube':'plat-yt','B站':'plat-yt','通用':'plat-sph'};
+const NAV=[
+  {id:'home',icon:'🏠',label:'首页'},
+  {id:'ip',icon:'🎭',label:'① IP 定位',step:true},
+  {id:'account',icon:'🪄',label:'② 账号搭建',step:true},
+  {id:'topics',icon:'💡',label:'③ 选题库',step:true},
+  {id:'factory',icon:'🏭',label:'④ 内容工厂',step:true},
+  {id:'publish',icon:'📡',label:'⑤ 发布内容',step:true},
+  {id:'analytics',icon:'📊',label:'⑥ 数据分析',step:true},
+  {id:'optimize',icon:'🔁',label:'⑦ 自动优化',step:true},
+  {id:'monetize',icon:'💰',label:'⑧ 变现追踪',step:true},
+  {id:'apis',icon:'⚙️',label:'API 设置'},
+];
+
+/* ══════════════════ COMPONENT: Sidebar ══════════════════ */
+function Sidebar({page,setPage,persona,apiKeys,done}){
+  return(
+    <div className="sidebar" style={{display:'flex',flexDirection:'column'}}>
+      <div style={{padding:'18px 14px 10px'}}>
+        <div style={{fontSize:16,fontWeight:800}}>🏭 <span className="gtext-w">内容变现工厂</span></div>
+        <div style={{fontSize:11,color:'#555',marginTop:2}}>AI全自动系统 · 新手可用</div>
+      </div>
+      {persona&&(
+        <div style={{margin:'0 8px 6px',padding:'8px 10px',background:'rgba(249,115,22,0.08)',border:'1px solid rgba(249,115,22,0.2)',borderRadius:9}}>
+          <div style={{fontSize:10,color:'#f97316',marginBottom:1}}>当前人设</div>
+          <div style={{fontSize:12,fontWeight:700,lineHeight:1.4,color:'#fbd38d'}}>{persona.tagline||persona.name}</div>
+        </div>
+      )}
+      <nav style={{flex:1,paddingBottom:8}}>
+        {NAV.map(n=>(
+          <div key={n.id} className={`nav-item ${page===n.id?'active':''}`} onClick={()=>setPage(n.id)}>
+            <span style={{fontSize:14}}>{n.icon}</span>
+            <span>{n.label}</span>
+            {n.step&&done.includes(n.id)&&<span style={{marginLeft:'auto',fontSize:10,color:'#4ade80'}}>✓</span>}
+          </div>
+        ))}
+      </nav>
+      <div style={{padding:'10px 14px',borderTop:'1px solid rgba(255,255,255,0.06)',fontSize:11}}>
+        <div style={{display:'flex',alignItems:'center',gap:6,color:'#666'}}>
+          <div style={{width:6,height:6,borderRadius:'50%',background:getAI(apiKeys)?.key?'#22c55e':'#ef4444'}}/>
+          {getAI(apiKeys)?.key?(apiKeys?.provider||'deepseek').toUpperCase()+' 已连接':'未配置 API Key'}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════ COMPONENT: Home ══════════════════ */
+function Home({setPage,persona,done,history}){
+  const steps=[
+    {id:'ip',n:1,icon:'🎭',label:'IP定位'},
+    {id:'account',n:2,icon:'🪄',label:'账号搭建'},
+    {id:'topics',n:3,icon:'💡',label:'选题库'},
+    {id:'factory',n:4,icon:'🏭',label:'内容工厂'},
+    {id:'publish',n:5,icon:'📡',label:'发布内容'},
+    {id:'analytics',n:6,icon:'📊',label:'数据分析'},
+    {id:'optimize',n:7,icon:'🔁',label:'自动优化'},
+    {id:'monetize',n:8,icon:'💰',label:'变现追踪'},
+  ];
+  const todayCount=history.filter(h=>{const d=new Date(h.createdAt);const n=new Date();return d.toDateString()===n.toDateString()}).length;
+  return(
+    <div style={{maxWidth:760,margin:'0 auto',padding:'36px 24px'}}>
+      <div style={{textAlign:'center',marginBottom:36}}>
+        <div style={{fontSize:52,marginBottom:12}}>🏭</div>
+        <h1 style={{fontSize:30,fontWeight:900,marginBottom:8}}>
+          <span className="gtext">内容变现工厂</span>
+        </h1>
+        <p style={{color:'#8888aa',fontSize:15,maxWidth:480,margin:'0 auto',lineHeight:1.7}}>
+          从0搭建你的内容账号 → AI帮你写内容找选题 → 一键发布多平台<br/>
+          <strong style={{color:'#f97316'}}>新手小白直接用，8步走完全流程</strong>
+        </p>
+      </div>
+
+      {/* Quick stats */}
+      {history.length>0&&(
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:24}}>
+          {[{v:history.length,l:'累计生产',c:'#f97316'},{v:todayCount,l:'今日产出',c:'#ec4899'},{v:done.length,l:'完成步骤',c:'#22c55e'}].map(s=>(
+            <div key={s.l} className="card" style={{padding:16,textAlign:'center'}}>
+              <div style={{fontSize:24,fontWeight:800,color:s.c}}>{s.v}</div>
+              <div style={{color:'#8888aa',fontSize:12,marginTop:2}}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Persona banner */}
+      {persona?(
+        <div className="card card-warm" style={{padding:18,marginBottom:24,display:'flex',gap:14,alignItems:'center'}}>
+          <span style={{fontSize:34}}>{PROFESSIONS.flatMap(c=>c.items).find(p=>p.id===persona.presetId)?.e||'✨'}</span>
+          <div style={{flex:1}}>
+            <div style={{fontWeight:700,fontSize:16}}>{persona.tagline}</div>
+            <div style={{color:'#8888aa',fontSize:13,marginTop:2}}>{persona.target}</div>
+          </div>
+          <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'flex-end',maxWidth:200}}>
+            {steps.map(s=>(
+              <span key={s.id} className={`tag ${done.includes(s.id)?'t-gr':'t-pu'}`} style={{fontSize:10}}>
+                {done.includes(s.id)?'✓':s.n} {s.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      ):(
+        <div className="card" style={{padding:24,marginBottom:24,textAlign:'center',border:'2px dashed rgba(249,115,22,0.3)'}}>
+          <div style={{fontSize:18,marginBottom:8}}>👋 还没设置人设哦</div>
+          <div style={{color:'#8888aa',marginBottom:16,fontSize:14}}>先完成第一步，AI才能帮你生产专属内容</div>
+          <button className="btn btn-primary" onClick={()=>setPage('ip')}>马上开始：定位我的 IP →</button>
+        </div>
+      )}
+
+      {/* 8 steps grid */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:24}}>
+        {steps.map(s=>(
+          <div key={s.id} className="card hover-card" onClick={()=>setPage(s.id)}
+            style={{padding:16,textAlign:'center',borderColor:done.includes(s.id)?'rgba(34,197,94,0.35)':'rgba(255,255,255,0.09)'}}>
+            <div style={{fontSize:22,marginBottom:6}}>{s.icon}</div>
+            <div style={{fontSize:12,fontWeight:600,color:done.includes(s.id)?'#4ade80':'#ccc'}}>
+              {done.includes(s.id)?'✓ ':''}{s.n}. {s.label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Quick links */}
+      <div className="card" style={{padding:18}}>
+        <div style={{fontSize:13,fontWeight:700,color:'#f97316',marginBottom:8}}>🔥 2026热门赛道（来自生财有术航海）</div>
+        <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:14}}>
+          {['小红书虚拟产品（2000+人在做）','小红书商单千粉实战','小红书垂直小店','AI视频图书带货','YouTube AI视频','AI定制服务PPT/视频'].map(t=>(
+            <span key={t} className="tag t-or" style={{fontSize:11,padding:'4px 10px'}}>{t}</span>
+          ))}
+        </div>
+        <div style={{fontSize:13,fontWeight:700,color:'#8888aa',marginBottom:12}}>🔗 常用工具直达（无需API，直接使用）</div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+          {[
+            {n:'即梦AI',url:'https://jimeng.jianying.com',d:'国内AI图片/视频，免费用'},
+            {n:'可灵AI',url:'https://klingai.com',d:'AI视频生成，快手出品'},
+            {n:'易媒助手',url:'https://ymt365.com',d:'一键发70+平台'},
+            {n:'新红数据',url:'https://xh.newrank.cn',d:'小红书数据分析'},
+            {n:'飞瓜数据',url:'https://www.feigua.tv',d:'抖音/视频号数据'},
+            {n:'Coze',url:'https://coze.cn',d:'免费搭建AI自动化流程'},
+          ].map(t=>(
+            <a key={t.n} href={t.url} target="_blank" rel="noreferrer"
+              style={{display:'block',padding:'10px',background:'rgba(255,255,255,0.04)',borderRadius:9,textDecoration:'none',transition:'background .2s'}}
+              onMouseOver={e=>e.currentTarget.style.background='rgba(255,255,255,0.08)'}
+              onMouseOut={e=>e.currentTarget.style.background='rgba(255,255,255,0.04)'}>
+              <div style={{color:'#f97316',fontWeight:600,fontSize:13}}>{t.n} ↗</div>
+              <div style={{color:'#666',fontSize:11,marginTop:2}}>{t.d}</div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════ STEP 1: IP Wizard ══════════════════ */
+function IPWizard({persona,setPersona,apiKeys,onDone}){
+  const [phase,setPhase]=useState(persona?'result':'choose');
+  const [selId,setSelId]=useState(persona?.presetId||null);
+  const [q,setQ]=useState({});
+  const [customData,setCustomData]=useState({background:'',target:'',style:'',products:'',hook:''});
+  const [loading,setLoading]=useState(false);
+  const [streaming,setStreaming]=useState('');
+
+  const allProfs=PROFESSIONS.flatMap(c=>c.items);
+  const selProf=allProfs.find(p=>p.id===selId);
+
+  const QUESTIONS=[
+    {k:'q1',label:'你最擅长什么、最感兴趣什么？',ph:'比如：7年做保险、心理学专业、一边带娃一边赚钱...'},
+    {k:'q2',label:'你最想帮助谁？他们最头疼什么？',ph:'比如：想买保险但看不懂的上班族、想做副业没方向的宝妈...'},
+    {k:'q3',label:'你最终想卖什么？',ph:'比如：保险服务、理财课程、穿搭咨询、工具订阅...'},
+    {k:'q4',label:'你希望别人提到你时，第一个想到什么？',ph:'比如：靠谱的保险顾问、帮我省了好多钱、讲心理学特别接地气...'},
+  ];
+
+  const generate=async()=>{
+    const cfg=getAI(apiKeys);
+    if(!cfg.key){alert('请先在「API设置」配置 API Key');return;}
+    setLoading(true);setStreaming('');setPhase('loading');
+    const isCustom=selId==='custom';
+    const context=isCustom
+      ?`背景：${customData.background}\n目标用户：${customData.target}\n风格：${customData.style}\n变现方式：${customData.products}`
+      :`职业/方向：${selProf?.n}（${selProf?.h}）\n补充：${Object.values(q).filter(Boolean).join('；')}`;
+
+    const prompt=`你是顶级个人IP顾问。根据以下信息，为这位内容创作者设计独特IP人设档案。
+
+${context}
+
+输出 JSON（只输出JSON，不要其他）：
+{
+  "tagline": "一句话定位（20字内，有记忆点，带情感）",
+  "target": "精准目标用户（一句话，有温度）",
+  "pain": "目标用户最大痛点（一句话，准确戳心）",
+  "style": "内容风格（20字内，具体不泛泛）",
+  "hook": "吸引关注的钩子句（一句有冲击力的话）",
+  "pillars": ["内容支柱1（具体）","内容支柱2","内容支柱3"],
+  "products": "变现产品由低到高3个（具体）",
+  "personality": ["独特标签1","独特标签2","独特标签3"],
+  "avoid": "绝对不能做的事（一句话）",
+  "opening_line": "见面时自我介绍的第一句话（真实口语化）"
+}`;
+    try{
+      const result=await streamAI(cfg,
+        '你是个人IP顾问。只输出JSON，不要其他文字。',prompt,t=>setStreaming(t));
+      const m=result.match(/\{[\s\S]*\}/);
+      if(m){
+        const data=JSON.parse(m[0]);
+        const p={presetId:selId,name:selProf?.n||'我的IP',...data};
+        setPersona(p);setPhase('result');
+      }else throw new Error('未能解析JSON');
+    }catch(e){alert('生成失败：'+e.message);setPhase(selId==='custom'?'custom':'questions');}
+    setLoading(false);
+  };
+
+  if(phase==='result'&&persona){
+    const prof=allProfs.find(p=>p.id===persona.presetId);
+    return(
+      <div style={{maxWidth:700,margin:'0 auto'}}>
+        <div style={{display:'flex',gap:14,alignItems:'flex-start',marginBottom:24}}>
+          <span style={{fontSize:42,flexShrink:0}}>{prof?.e||'✨'}</span>
+          <div style={{flex:1}}>
+            <h2 style={{fontSize:22,fontWeight:900,marginBottom:4}}>{persona.tagline}</h2>
+            <p style={{color:'#8888aa',fontSize:14}}>{persona.target}</p>
+          </div>
+          <button className="btn btn-ghost btn-sm" onClick={()=>setPhase('choose')}>重新设计</button>
+        </div>
+
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:14}}>
+          {[
+            {l:'🎯 目标用户痛点',v:persona.pain},
+            {l:'💬 内容风格',v:persona.style},
+            {l:'🪝 吸引关注钩子',v:persona.hook},
+            {l:'💰 变现路径',v:persona.products},
+          ].map(i=>(
+            <div key={i.l} className="card" style={{padding:14}}>
+              <div style={{fontSize:11,color:'#8888aa',marginBottom:5}}>{i.l}</div>
+              <div style={{fontSize:13,lineHeight:1.6}}>{i.v}</div>
+            </div>
+          ))}
+        </div>
+
+        {persona.pillars&&(
+          <div className="card" style={{padding:14,marginBottom:14}}>
+            <div style={{fontSize:11,color:'#8888aa',marginBottom:8}}>📊 三大内容支柱（所有内容围绕这三个方向）</div>
+            <div style={{display:'flex',gap:8}}>
+              {persona.pillars.map((p,i)=><span key={i} className="tag t-or" style={{fontSize:12,padding:'5px 12px'}}>{p}</span>)}
+            </div>
+          </div>
+        )}
+
+        {persona.personality&&(
+          <div style={{display:'flex',gap:8,marginBottom:14,flexWrap:'wrap'}}>
+            {persona.personality.map((t,i)=><span key={i} className="tag t-pu" style={{fontSize:12}}>{t}</span>)}
+          </div>
+        )}
+
+        {persona.opening_line&&(
+          <div style={{padding:'12px 16px',background:'rgba(249,115,22,0.08)',border:'1px solid rgba(249,115,22,0.25)',borderRadius:10,fontSize:13,fontStyle:'italic',color:'#fbd38d',marginBottom:14}}>
+            💬 自我介绍："{persona.opening_line}"
+          </div>
+        )}
+
+        {persona.avoid&&(
+          <div style={{padding:'10px 14px',background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:10,fontSize:12,color:'#fca5a5',marginBottom:20}}>
+            ⚠️ 雷区：{persona.avoid}
+          </div>
+        )}
+
+        <button className="btn btn-primary" style={{width:'100%'}} onClick={onDone}>
+          太好了！去搭建我的账号 →
+        </button>
+      </div>
+    );
+  }
+
+  if(phase==='loading'){
+    return(
+      <div style={{textAlign:'center',padding:'60px 20px',maxWidth:500,margin:'0 auto'}}>
+        <div style={{fontSize:48,marginBottom:16}}>🧠</div>
+        <div style={{fontSize:16,fontWeight:700,marginBottom:8}}>AI 正在设计你的专属 IP...</div>
+        <div style={{color:'#8888aa',fontSize:13,marginBottom:20}}>分析你的背景，生成独一无二的定位方案，约10-15秒</div>
+        {streaming&&<div className="output-area typing" style={{textAlign:'left',fontSize:12,maxHeight:180,overflow:'auto'}}>{streaming}</div>}
+      </div>
+    );
+  }
+
+  return(
+    <div style={{maxWidth:700,margin:'0 auto'}}>
+      <h2 className="section-title">🎭 第一步：找准你的 IP 定位</h2>
+      <p className="section-sub">选一个最接近你的方向，AI 会帮你细化成专属人设。30+ 职业方向，总有一个适合你。</p>
+
+      {PROFESSIONS.map(cat=>(
+        <div key={cat.cat} style={{marginBottom:20}}>
+          <div style={{fontSize:13,fontWeight:700,color:'#8888aa',marginBottom:8}}>{cat.cat}</div>
+          <div className="profession-grid">
+            {cat.items.map(p=>(
+              <div key={p.id} className={`card hover-card ${selId===p.id?'card-sel':''}`}
+                style={{padding:12,display:'flex',gap:10,alignItems:'flex-start'}}
+                onClick={()=>setSelId(p.id)}>
+                <span style={{fontSize:22,flexShrink:0,lineHeight:1}}>{p.e}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontWeight:700,fontSize:13,marginBottom:3}}>{p.n}</div>
+                  <div style={{color:'#8888aa',fontSize:11,lineHeight:1.4}}>{p.h}</div>
+                </div>
+                {selId===p.id&&<span style={{color:'#f97316',flexShrink:0}}>✓</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {selId&&selId!=='custom'&&(
+        <div className="card" style={{padding:20,marginBottom:16}}>
+          <div style={{fontWeight:600,marginBottom:14,fontSize:14}}>
+            ✏️ 告诉我更多（填得越多，人设越精准）
+          </div>
+          {QUESTIONS.map(qi=>(
+            <div key={qi.k} style={{marginBottom:12}}>
+              <div style={{fontSize:12,color:'#aaa',marginBottom:5}}>{qi.label}</div>
+              <input placeholder={qi.ph} value={q[qi.k]||''} onChange={e=>setQ({...q,[qi.k]:e.target.value})}/>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selId==='custom'&&(
+        <div className="card" style={{padding:20,marginBottom:16}}>
+          <div style={{fontWeight:600,marginBottom:14}}>✏️ 描述你的想法</div>
+          {[
+            {k:'background',l:'你的背景和专业',ph:'比如：做了8年保险，考过理财师，有心理学背景...'},
+            {k:'target',l:'你想帮助的人',ph:'比如：想买第一份保险但看不懂的上班族...'},
+            {k:'style',l:'你想要的内容风格',ph:'比如：接地气、专业有温度、不说行话...'},
+            {k:'products',l:'你打算卖什么',ph:'比如：保险咨询、理财课、1v1服务...'},
+          ].map(f=>(
+            <div key={f.k} style={{marginBottom:12}}>
+              <div style={{fontSize:12,color:'#aaa',marginBottom:5}}>{f.l}</div>
+              <input placeholder={f.ph} value={customData[f.k]} onChange={e=>setCustomData({...customData,[f.k]:e.target.value})}/>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{display:'flex',gap:12,alignItems:'center',marginTop:4}}>
+        <button className="btn btn-primary" disabled={!selId||loading} onClick={generate}>
+          {loading?'⚙️ 生成中...':'✨ AI 帮我设计专属人设 →'}
+        </button>
+        {!apiKeys?.claude&&(
+          <span style={{fontSize:12,color:'#f87171'}}>⚠️ 需要先配置 Claude API Key</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════ STEP 2: Account ══════════════════ */
+function AccountSetup({persona,apiKeys}){
+  const [tab,setTab]=useState('names');
+  const [result,setResult]=useState({names:'',bio:'',avatar:''});
+  const [loading,setLoading]=useState(false);
+  const [imgTool,setImgTool]=useState('jimeng');
+  const imgOpts=[
+    {id:'jimeng',n:'即梦AI（豆包）',cost:'¥0.04/张',flag:'🇨🇳',note:'无需翻墙，推荐',url:'https://jimeng.jianying.com'},
+    {id:'mj',n:'Midjourney',cost:'¥0.12/张',flag:'🌎',note:'效果最好',url:'https://piapi.ai'},
+    {id:'flux',n:'Flux Schnell',cost:'¥0.10/张',flag:'🌎',note:'速度快、便宜',url:'https://replicate.com'},
+  ];
+  if(!persona) return <div style={{textAlign:'center',padding:40,color:'#8888aa'}}>请先完成 IP 定位</div>;
+
+  const run=async(type)=>{
+    const cfg=getAI(apiKeys);
+    if(!cfg.key){alert('请先在「API设置」配置 API Key');return;}
+    setLoading(true);
+    const ct=CONTENT_TYPES.find(c=>c.id===type);
+    try{
+      await streamAI(cfg,ct.sys,ct.build(persona),t=>setResult(r=>({...r,[type===('names'||'bio')?type:type]:t})));
+    }catch(e){alert('生成失败：'+e.message);}
+    setLoading(false);
+  };
+
+  const avatarPrompt=`写实人像摄影风格，${persona.presetId==='mama'?'年轻中国女性':'中国内容创作者'}，
+自然微笑，专业但亲切，柔和自然光，简洁背景，
+适合社交媒体头像，高清，真实感强
+
+英文提示词版本：
+Realistic portrait photo, Chinese content creator,
+natural smile, professional yet approachable,
+soft natural lighting, clean background,
+social media profile photo style, high quality
+Negative: cartoon, illustration, ugly, deformed`;
+
+  return(
+    <div style={{maxWidth:700,margin:'0 auto'}}>
+      <h2 className="section-title">🪄 第二步：搭建你的账号</h2>
+      <p className="section-sub">AI帮你起名字、写简介、生成头像提示词，3分钟建好账号门面</p>
+
+      <div style={{display:'flex',gap:8,marginBottom:20}}>
+        {['names','bio','avatar'].map(t=>(
+          <button key={t} className={`btn ${tab===t?'btn-primary':'btn-ghost'} btn-sm`} onClick={()=>setTab(t)}>
+            {t==='names'?'📛 起名字':t==='bio'?'✍️ 写简介':'🖼️ 头像'}
+          </button>
+        ))}
+      </div>
+
+      {tab==='names'&&(
+        <div>
+          <button className="btn btn-primary" disabled={loading} onClick={()=>run('names')} style={{marginBottom:14}}>
+            {loading?'⚙️ 想名字中...':'✨ AI 帮我起 8 个名字'}
+          </button>
+          {result.names&&(
+            <div>
+              <div className="output-area">{result.names}</div>
+              <button className="btn btn-ghost btn-sm" style={{marginTop:8}} onClick={()=>navigator.clipboard.writeText(result.names).then(()=>alert('已复制'))}>📋 复制</button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab==='bio'&&(
+        <div>
+          <button className="btn btn-primary" disabled={loading} onClick={()=>run('bio')} style={{marginBottom:14}}>
+            {loading?'⚙️ 写简介中...':'✨ AI 帮我写 3 版简介'}
+          </button>
+          {result.bio&&(
+            <div>
+              <div className="output-area">{result.bio}</div>
+              <button className="btn btn-ghost btn-sm" style={{marginTop:8}} onClick={()=>navigator.clipboard.writeText(result.bio).then(()=>alert('已复制'))}>📋 复制</button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab==='avatar'&&(
+        <div>
+          <div style={{marginBottom:14}}>
+            <div style={{fontSize:13,color:'#aaa',marginBottom:8}}>选择图片生成工具</div>
+            <div style={{display:'flex',gap:8}}>
+              {imgOpts.map(o=>(
+                <div key={o.id} className={`card hover-card ${imgTool===o.id?'card-sel':''}`}
+                  style={{flex:1,padding:14,textAlign:'center'}} onClick={()=>setImgTool(o.id)}>
+                  <div style={{fontSize:18,marginBottom:4}}>{o.flag}</div>
+                  <div style={{fontWeight:700,fontSize:13}}>{o.n}</div>
+                  <div className="cost-pill" style={{display:'inline-block',margin:'4px 0'}}>{o.cost}</div>
+                  <div style={{fontSize:11,color:'#8888aa'}}>{o.note}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="card" style={{padding:16}}>
+            <div style={{fontSize:13,fontWeight:700,marginBottom:10}}>📋 头像生成提示词（直接复制使用）</div>
+            <div style={{background:'rgba(0,0,0,0.3)',borderRadius:9,padding:14,fontFamily:'monospace',fontSize:12,color:'#d4d4e0',lineHeight:1.8,whiteSpace:'pre-wrap'}}>{avatarPrompt}</div>
+            <div style={{display:'flex',gap:8,marginTop:12,flexWrap:'wrap'}}>
+              <button className="btn btn-ghost btn-sm" onClick={()=>navigator.clipboard.writeText(avatarPrompt).then(()=>alert('已复制'))}>📋 复制提示词</button>
+              {imgOpts.map(o=>(
+                <a key={o.id} href={o.url} target="_blank" rel="noreferrer"
+                  style={{padding:'7px 14px',background:'rgba(249,115,22,0.15)',border:'1px solid rgba(249,115,22,0.3)',borderRadius:8,color:'#f97316',fontSize:12,fontWeight:600,textDecoration:'none'}}>
+                  去 {o.n} 生成 ↗
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════ STEP 3: Topics ══════════════════ */
+function Topics({persona,apiKeys,topics,setTopics}){
+  const [plat,setPlat]=useState('小红书');
+  const [competitor,setCompetitor]=useState('');
+  const [direction,setDirection]=useState('');
+  const [count,setCount]=useState(20);
+  const [loading,setLoading]=useState(false);
+  const [status,setStatus]=useState('');
+  const [filter,setFilter]=useState('全部');
+  const [manualTitle,setManualTitle]=useState('');
+
+  const gen=async()=>{
+    const cfg=getAI(apiKeys);
+    if(!cfg.key){alert('请先在「API设置」配置 API Key');return;}
+    if(!persona){alert('请先完成 IP 定位');return;}
+    setLoading(true);setStatus('');
+    const p=CONTENT_TYPES.find(c=>c.id==='topic30');
+    const prompt=p.build({...persona,name:persona.tagline||persona.name},plat);
+    const fullPrompt=`${prompt}
+补充信息：
+- 对标账号参考风格：${competitor||'无'}
+- 具体内容方向：${direction||'通用'}
+- 需要数量：${count}个`;
+    try{
+      const raw=await streamAI(cfg,p.sys,fullPrompt,t=>setStatus(t));
+      const m=raw.match(/\[[\s\S]*\]/);
+      if(m){
+        const arr=JSON.parse(m[0]);
+        const newT=arr.slice(0,count).map(t=>({...t,id:Date.now()+Math.random(),platform:plat,status:'待生产',createdAt:new Date().toISOString()}));
+        setTopics(prev=>[...prev,...newT]);
+        setStatus(`✅ 成功生成 ${newT.length} 个选题！`);
+      }
+    }catch(e){alert('生成失败：'+e.message);}
+    setLoading(false);
+  };
+
+  const addManual=()=>{
+    if(!manualTitle.trim())return;
+    setTopics(prev=>[...prev,{id:Date.now(),title:manualTitle,platform:plat,type:'待定',potential:'中',status:'待生产',createdAt:new Date().toISOString()}]);
+    setManualTitle('');
+  };
+
+  const del=id=>setTopics(t=>t.filter(x=>x.id!==id));
+  const upd=(id,s)=>setTopics(t=>t.map(x=>x.id===id?{...x,status:s}:x));
+  const filtered=filter==='全部'?topics:topics.filter(t=>t.status===filter||t.type===filter||t.platform===filter);
+
+  return(
+    <div style={{maxWidth:740,margin:'0 auto'}}>
+      <h2 className="section-title">💡 第三步：建立选题库</h2>
+      <p className="section-sub">AI批量生成选题，再也不愁没内容写</p>
+
+      <div className="card" style={{padding:20,marginBottom:20}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
+          <div>
+            <div style={{fontSize:12,color:'#aaa',marginBottom:5}}>发布平台</div>
+            <select value={plat} onChange={e=>setPlat(e.target.value)}>
+              {['小红书','公众号','视频号','抖音','YouTube'].map(p=><option key={p}>{p}</option>)}
+            </select>
+          </div>
+          <div>
+            <div style={{fontSize:12,color:'#aaa',marginBottom:5}}>生成数量</div>
+            <select value={count} onChange={e=>setCount(Number(e.target.value))}>
+              {[10,20,30,50].map(n=><option key={n} value={n}>{n}个</option>)}
+            </select>
+          </div>
+          <div>
+            <div style={{fontSize:12,color:'#aaa',marginBottom:5}}>参考对标账号（可选）</div>
+            <input placeholder="填入对标账号名，让AI学习其风格" value={competitor} onChange={e=>setCompetitor(e.target.value)}/>
+          </div>
+          <div>
+            <div style={{fontSize:12,color:'#aaa',marginBottom:5}}>细分内容方向（可选）</div>
+            <input placeholder="比如：保险科普、理财入门、宝妈副业" value={direction} onChange={e=>setDirection(e.target.value)}/>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:10,alignItems:'center'}}>
+          <button className="btn btn-primary" disabled={loading||!persona} onClick={gen}>
+            {loading?'⚙️ 生成中...':'⚡ AI 批量生成选题'}
+          </button>
+          {status&&!loading&&<span style={{fontSize:12,color:'#4ade80'}}>{status.startsWith('✅')?status:''}</span>}
+        </div>
+
+        <div className="divider"/>
+        <div style={{fontSize:12,color:'#aaa',marginBottom:8}}>或者手动添加</div>
+        <div style={{display:'flex',gap:8}}>
+          <input placeholder="手动输入一个选题标题..." value={manualTitle} onChange={e=>setManualTitle(e.target.value)}
+            onKeyDown={e=>e.key==='Enter'&&addManual()} style={{flex:1}}/>
+          <button className="btn btn-ghost btn-sm" onClick={addManual} style={{flexShrink:0}}>添加</button>
+        </div>
+      </div>
+
+      {topics.length>0&&(
+        <>
+          <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12}}>
+            {['全部','待生产','已完成','收藏型','转发型','评论型'].map(f=>(
+              <button key={f} onClick={()=>setFilter(f)}
+                style={{padding:'4px 12px',borderRadius:999,fontSize:12,cursor:'pointer',border:'none',
+                  background:filter===f?'#f97316':'rgba(255,255,255,0.08)',color:filter===f?'#fff':'#8888aa',fontFamily:'inherit'}}>
+                {f}{f==='全部'?` (${topics.length})`:''}
+              </button>
+            ))}
+            <button onClick={()=>{if(confirm('清空所有选题？'))setTopics([])}}
+              style={{padding:'4px 12px',borderRadius:999,fontSize:12,cursor:'pointer',border:'none',
+                background:'rgba(239,68,68,0.15)',color:'#f87171',fontFamily:'inherit',marginLeft:'auto'}}>清空</button>
+          </div>
+          <div style={{display:'flex',flexDirection:'column',gap:7}}>
+            {filtered.map(t=>(
+              <div key={t.id} className="card" style={{padding:'11px 14px',display:'flex',alignItems:'center',gap:9}}>
+                <span style={{fontSize:14}}>{t.potential==='高'?'🔥':'⭐'}</span>
+                <span className={`plat ${PLAT_STYLE[t.platform]||'plat-sph'}`}>{t.platform}</span>
+                {t.type&&t.type!=='待定'&&<span className={`tag ${t.type==='收藏型'?'t-bl':t.type==='转发型'?'t-pk':'t-gr'}`} style={{fontSize:10}}>{t.type}</span>}
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13,fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{t.title}</div>
+                  {t.hook&&<div style={{fontSize:11,color:'#666',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{t.hook}</div>}
+                </div>
+                <select value={t.status} onChange={e=>upd(t.id,e.target.value)}
+                  style={{width:'auto',fontSize:11,padding:'3px 8px',flex:'none'}}>
+                  {['待生产','生产中','已完成','已发布'].map(s=><option key={s}>{s}</option>)}
+                </select>
+                <button onClick={()=>del(t.id)} style={{background:'none',border:'none',color:'#444',cursor:'pointer',fontSize:13,padding:'0 4px'}}>✕</button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════ STEP 4: Factory ══════════════════ */
+function Factory({persona,topics,apiKeys,onSave}){
+  const [ctId,setCtId]=useState('xhs');
+  const [topic,setTopic]=useState('');
+  const [topicSrc,setTopicSrc]=useState('manual');
+  const [humanize,setHumanize]=useState(true);
+  const [output,setOutput]=useState('');
+  const [loading,setLoading]=useState(false);
+  const [batchMode,setBatchMode]=useState(false);
+  const [batchText,setBatchText]=useState('');
+  const [batchRes,setBatchRes]=useState([]);
+  const [batchLoading,setBatchLoading]=useState(false);
+  const outRef=useRef(null);
+
+  const ct=CONTENT_TYPES.find(c=>c.id===ctId);
+
+  const run=async()=>{
+    const cfg=getAI(apiKeys);
+    if(!cfg.key){alert('请先在「API设置」配置 API Key');return;}
+    const finalTopic=topic.trim();
+    if(!finalTopic){alert('请输入选题');return;}
+    setLoading(true);setOutput('');
+    const p=persona||{tagline:'内容创作者',style:'真实自然',target:'普通读者',products:'课程',hook:'',pillars:[]};
+    const userPrompt=ct.build(p,finalTopic,humanize);
+    const sysPrompt=ct.sys+(humanize?'\n【去AI感】：避免完美排版，加口语停顿，像真人写的。':'');
+    try{
+      const result=await streamAI(cfg,sysPrompt,userPrompt,t=>{setOutput(t);if(outRef.current)outRef.current.scrollTop=outRef.current.scrollHeight;});
+      onSave({platform:ct.plat,topic:finalTopic,type:ct.name,persona:p.tagline||'',content:result,createdAt:new Date().toISOString()});
+    }catch(e){alert('生成失败：'+e.message);}
+    setLoading(false);
+  };
+
+  const runBatch=async()=>{
+    const cfg=getAI(apiKeys);
+    if(!cfg.key){alert('请先在「API设置」配置 API Key');return;}
+    const tList=batchText.split('\n').filter(t=>t.trim());
+    if(!tList.length)return;
+    setBatchLoading(true);setBatchRes([]);
+    const p=persona||{tagline:'内容创作者',style:'真实自然',target:'普通读者',products:'课程'};
+    for(const t of tList){
+      try{
+        const r=await streamAI(cfg,ct.sys,ct.build(p,t,humanize),null);
+        setBatchRes(prev=>[...prev,{topic:t,content:r,status:'done'}]);
+        onSave({platform:ct.plat,topic:t,type:ct.name,persona:p.tagline||'',content:r,createdAt:new Date().toISOString()});
+      }catch(e){setBatchRes(prev=>[...prev,{topic:t,content:'',status:'error',error:e.message}]);}
+      await new Promise(r=>setTimeout(r,600));
+    }
+    setBatchLoading(false);
+  };
+
+  return(
+    <div style={{maxWidth:800,margin:'0 auto'}}>
+      <h2 className="section-title">🏭 第四步：内容工厂</h2>
+      <p className="section-sub">选好类型填入选题，AI自动生产 — 每篇都有「去AI感」处理，读起来像真人写的</p>
+
+      {/* Content type selector */}
+      <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:16}}>
+        {CONTENT_TYPES.map(c=>(
+          <button key={c.id} onClick={()=>setCtId(c.id)}
+            className={`btn btn-sm ${ctId===c.id?'btn-primary':'btn-ghost'}`} style={{fontSize:12}}>
+            {c.icon} {c.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Mode toggle */}
+      <div style={{display:'flex',gap:8,marginBottom:14}}>
+        {[{v:false,l:'🎯 单篇生产'},{v:true,l:'⚡ 批量生产'}].map(m=>(
+          <button key={m.l} onClick={()=>setBatchMode(m.v)}
+            style={{padding:'6px 14px',borderRadius:8,fontSize:12,cursor:'pointer',border:'none',fontFamily:'inherit',
+              background:batchMode===m.v?'rgba(249,115,22,0.2)':'rgba(255,255,255,0.07)',
+              color:batchMode===m.v?'#f97316':'#8888aa'}}>
+            {m.l}
+          </button>
+        ))}
+        <label style={{display:'flex',alignItems:'center',gap:6,fontSize:12,cursor:'pointer',marginLeft:'auto',color:'#ccc'}}>
+          <input type="checkbox" checked={humanize} onChange={e=>setHumanize(e.target.checked)} style={{width:'auto',accentColor:'#f97316'}}/>
+          🧑 去AI感处理
+        </label>
+      </div>
+
+      {!batchMode?(
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1.6fr',gap:14}}>
+          <div>
+            <div className="card" style={{padding:16}}>
+              <div style={{fontSize:12,color:'#aaa',marginBottom:8}}>选题来源</div>
+              <div style={{display:'flex',gap:6,marginBottom:10}}>
+                {[{v:'manual',l:'手动输入'},{v:'library',l:'从选题库'}].map(s=>(
+                  <button key={s.v} onClick={()=>setTopicSrc(s.v)}
+                    style={{flex:1,padding:'6px',borderRadius:7,fontSize:11,cursor:'pointer',border:'none',fontFamily:'inherit',
+                      background:topicSrc===s.v?'rgba(249,115,22,0.2)':'rgba(255,255,255,0.06)',color:topicSrc===s.v?'#f97316':'#888'}}>
+                    {s.l}
+                  </button>
+                ))}
+              </div>
+              {topicSrc==='manual'?(
+                <textarea rows={3} placeholder="输入今天的选题..." value={topic} onChange={e=>setTopic(e.target.value)} style={{marginBottom:10,resize:'none'}}/>
+              ):(
+                <select value={topic} onChange={e=>setTopic(e.target.value)} style={{marginBottom:10}}>
+                  <option value="">选择选题...</option>
+                  {topics.filter(t=>t.status==='待生产').map(t=>(
+                    <option key={t.id} value={t.title}>{t.title}</option>
+                  ))}
+                </select>
+              )}
+              <button className="btn btn-primary" disabled={loading} onClick={run} style={{width:'100%'}}>
+                {loading?'⚙️ 生产中...':'🚀 开始生产'}
+              </button>
+            </div>
+          </div>
+          <div>
+            {output?(
+              <div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
+                  <span style={{fontSize:12,color:'#8888aa'}}>生成结果 · {output.length}字</span>
+                  <button className="btn btn-ghost btn-sm" onClick={()=>navigator.clipboard.writeText(output).then(()=>alert('已复制'))}>📋 复制</button>
+                </div>
+                <div className={`output-area ${loading?'typing':''}`} ref={outRef} style={{maxHeight:460,overflow:'auto'}}>{output}</div>
+              </div>
+            ):(
+              <div className="card" style={{height:280,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#555'}}>
+                <div style={{fontSize:36,marginBottom:10}}>🤖</div>
+                <div>配置好选题后点击「开始生产」</div>
+              </div>
+            )}
+          </div>
+        </div>
+      ):(
+        <div>
+          <div className="card" style={{padding:18,marginBottom:14}}>
+            <div style={{fontSize:12,color:'#aaa',marginBottom:8}}>批量输入选题（每行一个）</div>
+            <textarea rows={7} value={batchText} onChange={e=>setBatchText(e.target.value)}
+              placeholder={"保险怎么选才不踩坑\n月薪5000应该先买哪种保险\n这3种保险骗局大家要小心\n医疗险和百万医疗险的区别"}
+              style={{marginBottom:12}}/>
+            <div style={{display:'flex',gap:10,alignItems:'center'}}>
+              <button className="btn btn-primary" disabled={batchLoading} onClick={runBatch}>
+                {batchLoading?'⚙️ 批量生产中...':'⚡ 批量生产'}
+              </button>
+              <span style={{fontSize:12,color:'#8888aa'}}>{batchText.split('\n').filter(t=>t.trim()).length} 个选题</span>
+            </div>
+          </div>
+          {batchRes.length>0&&(
+            <div style={{display:'flex',flexDirection:'column',gap:9}}>
+              {batchRes.map((r,i)=>(
+                <div key={i} className="card" style={{padding:14,borderColor:r.status==='done'?'rgba(34,197,94,0.3)':'rgba(239,68,68,0.3)'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+                    <span style={{fontSize:13,fontWeight:600}}>{r.topic}</span>
+                    <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                      <span style={{fontSize:11,color:r.status==='done'?'#4ade80':'#f87171'}}>{r.status==='done'?'✅ 完成':'❌ 失败'}</span>
+                      {r.status==='done'&&<button className="btn btn-ghost btn-sm" onClick={()=>navigator.clipboard.writeText(r.content)}>复制</button>}
+                    </div>
+                  </div>
+                  {r.content&&<div style={{fontSize:11,color:'#8888aa',lineClamp:2}}>{r.content.slice(0,120)}...</div>}
+                  {r.error&&<div style={{fontSize:11,color:'#f87171'}}>{r.error}</div>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════ STEP 5: Publish ══════════════════ */
+function Publish(){
+  const tools=[
+    {n:'易媒助手',url:'https://ymt365.com',desc:'70+平台一键发布，支持定时，多账号，最适合新手',price:'¥99-299/月',tag:'🔥新手首选',e:'🚀'},
+    {n:'矩阵通（新榜）',url:'https://jztvip.newrank.cn',desc:'企业级多账号管理，5个账号以上选这个',price:'联系商务',tag:'💼企业级',e:'📊'},
+    {n:'蚁小二',url:'https://www.yxer.com',desc:'操作简单，多账号批量发，性价比高',price:'¥99/月起',tag:'✅简单易用',e:'🐜'},
+    {n:'Coze工作流',url:'https://coze.cn',desc:'免费搭建自动化，可定时生产+发布，技术向',price:'免费',tag:'🆓全免费',e:'🤖'},
+    {n:'n8n（自托管）',url:'https://n8n.io',desc:'开源完全免费，支持任意API，高度可定制',price:'自托管免费',tag:'⚙️开源',e:'🔧'},
+  ];
+  const schedule=[
+    {p:'小红书',s:'每周3-4篇',t:'早9点 / 晚7点',tip:'周一三五日发'},
+    {p:'公众号',s:'每周2-3篇',t:'周二四晚8点',tip:'黄金时段'},
+    {p:'视频号',s:'每周3条视频',t:'工作日晚7-9点',tip:'直播每周1-2次'},
+    {p:'抖音',s:'每天1-2条',t:'早7-9 / 午12 / 晚7-9',tip:'发布后1小时内互动'},
+  ];
+  return(
+    <div style={{maxWidth:740,margin:'0 auto'}}>
+      <h2 className="section-title">📡 第五步：发布内容</h2>
+      <p className="section-sub">选一个分发工具，一次发内容同步到70+平台，省去重复复制粘贴</p>
+      <div style={{marginBottom:24}}>
+        <div style={{fontWeight:700,marginBottom:12,fontSize:14}}>📅 最佳发布时间（数据统计）</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+          {schedule.map(s=>(
+            <div key={s.p} className="card" style={{padding:14}}>
+              <span className={`plat ${PLAT_STYLE[s.p]||'plat-sph'}`} style={{marginBottom:8,display:'inline-block'}}>{s.p}</span>
+              <div style={{fontWeight:700,fontSize:14}}>{s.s}</div>
+              <div style={{color:'#8888aa',fontSize:12,marginTop:3}}>⏰ {s.t}</div>
+              <div style={{color:'#666',fontSize:11,marginTop:2}}>💡 {s.tip}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{fontWeight:700,marginBottom:12,fontSize:14}}>🛠️ 一键分发工具</div>
+      <div style={{display:'flex',flexDirection:'column',gap:10}}>
+        {tools.map(t=>(
+          <a key={t.n} href={t.url} target="_blank" rel="noreferrer" style={{textDecoration:'none'}}>
+            <div className="card hover-card" style={{padding:16,display:'flex',gap:14,alignItems:'center'}}>
+              <span style={{fontSize:26}}>{t.e}</span>
+              <div style={{flex:1}}>
+                <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:4}}>
+                  <span style={{fontWeight:700,fontSize:15,color:'#e2e2f0'}}>{t.n}</span>
+                  <span className="tag t-or" style={{fontSize:10}}>{t.tag}</span>
+                </div>
+                <div style={{fontSize:12,color:'#8888aa'}}>{t.desc}</div>
+              </div>
+              <div style={{textAlign:'right',flexShrink:0}}>
+                <div className="cost-pill">{t.price}</div>
+                <div style={{color:'#f97316',fontSize:11,marginTop:4}}>前往 ↗</div>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════ STEP 6: Analytics ══════════════════ */
+function Analytics(){
+  const tools=[
+    {n:'新红数据',url:'https://xh.newrank.cn',p:'小红书专项',desc:'最专业的小红书数据，竞品监控，爆款解析',price:'¥299/月起',e:'📊'},
+    {n:'飞瓜数据',url:'https://www.feigua.tv',p:'抖音/视频号',desc:'直播分析、带货榜单、达人数据',price:'¥299/月起',e:'🎯'},
+    {n:'蝉妈妈',url:'https://www.chanmama.com',p:'全平台电商',desc:'带货数据、选品分析、直播复盘',price:'¥199/月起',e:'🦋'},
+    {n:'5118',url:'https://www.5118.com',p:'关键词热度',desc:'验证选题热度，SEO关键词，搜索量分析',price:'¥299/月',e:'🔍'},
+  ];
+  const [records,setRecords]=useState(()=>LS.g('ana_v3',[]));
+  const [form,setForm]=useState({platform:'小红书',title:'',likes:0,comments:0,collects:0,fans:0,date:new Date().toISOString().slice(0,10)});
+  useEffect(()=>LS.s('ana_v3',records),[records]);
+  const add=()=>{if(!form.title)return;setRecords([...records,{...form,id:Date.now()}]);setForm({...form,title:'',likes:0,comments:0,collects:0,fans:0});};
+  const bestContent=records.sort((a,b)=>(b.likes+b.comments+b.collects)-(a.likes+a.comments+a.collects))[0];
+  return(
+    <div style={{maxWidth:740,margin:'0 auto'}}>
+      <h2 className="section-title">📊 第六步：数据分析</h2>
+      <p className="section-sub">记录每篇内容数据，找出爆款规律</p>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
+        {tools.map(t=>(
+          <a key={t.n} href={t.url} target="_blank" rel="noreferrer" style={{textDecoration:'none'}}>
+            <div className="card hover-card" style={{padding:14}}>
+              <div style={{display:'flex',gap:10,alignItems:'center',marginBottom:6}}>
+                <span style={{fontSize:20}}>{t.e}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,fontSize:13,color:'#e2e2f0'}}>{t.n} ↗</div>
+                  <span className="tag t-pu" style={{fontSize:10}}>{t.p}</span>
+                </div>
+                <div className="cost-pill" style={{fontSize:10}}>{t.price}</div>
+              </div>
+              <div style={{fontSize:11,color:'#8888aa'}}>{t.desc}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+      {bestContent&&(
+        <div className="card card-warm" style={{padding:14,marginBottom:16}}>
+          <div style={{fontSize:12,color:'#f97316',marginBottom:4}}>🏆 目前表现最好的内容</div>
+          <div style={{fontWeight:700}}>{bestContent.title}</div>
+          <div style={{fontSize:12,color:'#8888aa',marginTop:4}}>👍{bestContent.likes} 💬{bestContent.comments} ⭐{bestContent.collects} +{bestContent.fans}粉</div>
+        </div>
+      )}
+      <div className="card" style={{padding:18,marginBottom:14}}>
+        <div style={{fontWeight:700,marginBottom:14,fontSize:14}}>📝 手动记录数据</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
+          <div>
+            <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>平台</div>
+            <select value={form.platform} onChange={e=>setForm({...form,platform:e.target.value})}>
+              {['小红书','公众号','视频号','抖音'].map(p=><option key={p}>{p}</option>)}
+            </select>
+          </div>
+          <div>
+            <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>日期</div>
+            <input type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/>
+          </div>
+          <div style={{gridColumn:'1/-1'}}>
+            <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>内容标题</div>
+            <input placeholder="这篇内容的标题" value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/>
+          </div>
+          {[{k:'likes',l:'👍点赞'},{k:'comments',l:'💬评论'},{k:'collects',l:'⭐收藏'},{k:'fans',l:'➕涨粉'}].map(f=>(
+            <div key={f.k}>
+              <div style={{fontSize:11,color:'#aaa',marginBottom:4}}>{f.l}</div>
+              <input type="number" value={form[f.k]} onChange={e=>setForm({...form,[f.k]:Number(e.target.value)})}/>
+            </div>
+          ))}
+        </div>
+        <button className="btn btn-primary btn-sm" onClick={add}>记录数据</button>
+      </div>
+      {records.length>0&&(
+        <div style={{display:'flex',flexDirection:'column',gap:6}}>
+          {records.slice(-8).reverse().map(r=>(
+            <div key={r.id} className="card" style={{padding:'10px 14px',display:'flex',gap:9,alignItems:'center',fontSize:12}}>
+              <span className={`plat ${PLAT_STYLE[r.platform]||'plat-sph'}`}>{r.platform}</span>
+              <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{r.title}</span>
+              <span style={{color:'#f97316'}}>👍{r.likes}</span>
+              <span style={{color:'#60a5fa'}}>💬{r.comments}</span>
+              <span style={{color:'#fbbf24'}}>⭐{r.collects}</span>
+              <span style={{color:'#4ade80'}}>+{r.fans}粉</span>
+              <button onClick={()=>setRecords(records.filter(x=>x.id!==r.id))} style={{background:'none',border:'none',color:'#444',cursor:'pointer'}}>✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════ STEP 7: Optimize ══════════════════ */
+function Optimize({history,persona,apiKeys}){
+  const [result,setResult]=useState('');
+  const [loading,setLoading]=useState(false);
+  const ana=LS.g('ana_v3',[]);
+  const run=async()=>{
+    const cfg=getAI(apiKeys);
+    if(!cfg.key){alert('请先在「API设置」配置 API Key');return;}
+    setLoading(true);setResult('');
+    const histStr=history.slice(-30).map(h=>`[${h.platform}] ${h.topic} · ${h.type}`).join('\n');
+    const anaStr=ana.slice(-20).map(a=>`[${a.platform}] ${a.title} → 赞${a.likes} 评${a.comments} 藏${a.collects} +${a.fans}粉`).join('\n');
+    await streamAI(cfg,
+      '你是内容增长顾问，说话直接，给具体可操作建议，不说废话。',
+      `分析以下内容创作者数据，给出优化建议：
+
+人设：${persona?.tagline||'内容创作者'}
+目标用户：${persona?.target||''}
+
+最近生产内容（${history.length}条）：
+${histStr||'（暂无）'}
+
+内容表现数据（${ana.length}条）：
+${anaStr||'（暂无）'}
+
+请给出：
+1. 哪类内容最受欢迎？为什么？
+2. 哪类内容表现差？建议停掉还是调整？
+3. 下周最值得做的3个选题（具体标题）
+4. 发布频率/时间是否需要调整？
+5. 一个这周立刻能执行的改进动作
+
+说话像顾问，不是AI报告，数据支撑，直接。`,
+      t=>setResult(t));
+    setLoading(false);
+  };
+  const autoTools=[
+    {n:'Coze工作流',url:'https://coze.cn',d:'免费，可视化搭建，不会代码也能用。可实现：定时生成选题→AI写稿→推送到飞书/微信',tag:'🆓免费推荐'},
+    {n:'n8n（自托管）',url:'https://n8n.io',d:'开源免费，支持所有API，完全可控，稍有技术门槛',tag:'⚙️开源'},
+    {n:'Make（Integromat）',url:'https://make.com',d:'可视化流程，每月1000次免费操作，适合入门',tag:'✅新手友好'},
+  ];
+  return(
+    <div style={{maxWidth:700,margin:'0 auto'}}>
+      <h2 className="section-title">🔁 第七步：自动优化</h2>
+      <p className="section-sub">AI分析你的数据，找爆款规律，给下一步方向</p>
+      <div className="card" style={{padding:20,marginBottom:16}}>
+        <div style={{fontSize:13,color:'#8888aa',marginBottom:12}}>
+          数据库：<span style={{color:'#f97316',fontWeight:700}}>{history.length}</span> 条生产记录 ·
+          <span style={{color:'#f97316',fontWeight:700}}>{ana.length}</span> 条表现数据
+          {(history.length+ana.length)<5&&<span style={{color:'#f87171',marginLeft:8}}>（积累5条以上数据后分析更准）</span>}
+        </div>
+        <button className="btn btn-primary" disabled={loading} onClick={run}>
+          {loading?'⚙️ 分析中...':'🔍 AI 分析数据，给我优化建议'}
+        </button>
+      </div>
+      {result&&<div className="output-area" style={{marginBottom:20}}>{result}</div>}
+      <div style={{fontWeight:700,marginBottom:12,fontSize:14}}>🤖 自动化工作流（进阶玩法）</div>
+      <div style={{display:'flex',flexDirection:'column',gap:10}}>
+        {autoTools.map(t=>(
+          <a key={t.n} href={t.url} target="_blank" rel="noreferrer" style={{textDecoration:'none'}}>
+            <div className="card hover-card" style={{padding:14,display:'flex',gap:12,alignItems:'center'}}>
+              <div style={{flex:1}}>
+                <div style={{display:'flex',gap:8,marginBottom:4}}>
+                  <span style={{fontWeight:600,color:'#e2e2f0',fontSize:14}}>{t.n} ↗</span>
+                  <span className="tag t-or" style={{fontSize:10}}>{t.tag}</span>
+                </div>
+                <div style={{fontSize:12,color:'#8888aa'}}>{t.d}</div>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════ STEP 8: Monetize ══════════════════ */
+function Monetize(){
+  const [records,setRecords]=useState(()=>LS.g('mon_v3',[]));
+  const [form,setForm]=useState({ch:'知识付费',amount:'',date:new Date().toISOString().slice(0,10),note:''});
+  useEffect(()=>LS.s('mon_v3',records),[records]);
+  const add=()=>{if(!form.amount)return;setRecords([...records,{...form,id:Date.now()}]);setForm({...form,amount:'',note:''}); };
+  const total=records.reduce((s,r)=>s+Number(r.amount),0);
+  const month=records.filter(r=>r.date?.slice(0,7)===new Date().toISOString().slice(0,7)).reduce((s,r)=>s+Number(r.amount),0);
+  const byCh={};records.forEach(r=>{byCh[r.ch]=(byCh[r.ch]||0)+Number(r.amount);});
+  const CHS=['虚拟产品','商单接单','知识付费','工具订阅','1v1咨询','直播带货','流量主广告','企业合作','带货佣金','AI定制服务','其他'];
+  const PATHS=[
+    {ch:'虚拟产品',range:'¥9.9-99/份',start:'🔥2026最热，0库存0发货，小红书最快',icon:'📦'},
+    {ch:'商单接单',range:'¥500-5000/条',start:'🔥千粉可接，真实测评类最受欢迎',icon:'🤝'},
+    {ch:'AI定制服务',range:'¥200-2000/单',start:'🔥做PPT/视频/剧本，接单门槛低',icon:'🎯'},
+    {ch:'知识付费',range:'¥99-1997/人',start:'第一个产品可以是电子书/模板',icon:'📚'},
+    {ch:'1v1咨询',range:'¥500-2000/小时',start:'50个精准粉就能接单',icon:'💬'},
+    {ch:'直播带货',range:'视销量',start:'300粉可以开始',icon:'🎥'},
+    {ch:'流量主广告',range:'¥50-80/千次阅读',start:'公众号500粉即可开通',icon:'📺'},
+    {ch:'企业合作',range:'¥3000-30000/次',start:'粉丝质量比数量重要',icon:'💼'},
+  ];
+  return(
+    <div style={{maxWidth:740,margin:'0 auto'}}>
+      <h2 className="section-title">💰 第八步：变现追踪</h2>
+      <p className="section-sub">记录每一笔收入，看清哪个渠道最赚钱</p>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:20}}>
+        {[{v:`¥${total.toLocaleString()}`,l:'累计收入',c:'#4ade80'},{v:`¥${month.toLocaleString()}`,l:'本月收入',c:'#f97316'},{v:`${records.length}笔`,l:'收入记录',c:'#c084fc'}].map(s=>(
+          <div key={s.l} className="card" style={{padding:16,textAlign:'center'}}>
+            <div className="stat-big" style={{color:s.c}}>{s.v}</div>
+            <div style={{color:'#8888aa',fontSize:12,marginTop:4}}>{s.l}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:20}}>
+        <div className="card" style={{padding:18}}>
+          <div style={{fontWeight:700,marginBottom:14}}>➕ 记录收入</div>
+          <select value={form.ch} onChange={e=>setForm({...form,ch:e.target.value})} style={{marginBottom:10}}>
+            {CHS.map(c=><option key={c}>{c}</option>)}
+          </select>
+          <input type="number" placeholder="金额（元）" value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})} style={{marginBottom:10}}/>
+          <input type="date" value={form.date} onChange={e=>setForm({...form,date:e.target.value})} style={{marginBottom:10}}/>
+          <input placeholder="备注（可选）" value={form.note} onChange={e=>setForm({...form,note:e.target.value})} style={{marginBottom:12}}/>
+          <button className="btn btn-primary btn-sm" onClick={add}>记录</button>
+        </div>
+        <div className="card" style={{padding:18}}>
+          <div style={{fontWeight:700,marginBottom:14}}>📊 渠道分布</div>
+          {Object.keys(byCh).length===0?<div style={{color:'#666',fontSize:13}}>暂无数据</div>:
+            Object.entries(byCh).sort((a,b)=>b[1]-a[1]).map(([ch,amt])=>(
+              <div key={ch} style={{marginBottom:10}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:12,marginBottom:3}}>
+                  <span>{ch}</span><span style={{color:'#4ade80'}}>¥{amt.toLocaleString()}</span>
+                </div>
+                <div style={{height:4,background:'rgba(255,255,255,0.08)',borderRadius:2}}>
+                  <div style={{height:'100%',width:`${(amt/total*100).toFixed(0)}%`,background:'linear-gradient(90deg,#f97316,#ec4899)',borderRadius:2}}/>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <div className="card" style={{padding:18,marginBottom:14}}>
+        <div style={{fontWeight:700,marginBottom:14}}>🗺️ 变现路径（由易到难）</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9}}>
+          {PATHS.map(p=>(
+            <div key={p.ch} style={{padding:12,background:'rgba(255,255,255,0.04)',borderRadius:10}}>
+              <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:4}}>
+                <span style={{fontSize:16}}>{p.icon}</span><span style={{fontWeight:600,fontSize:13}}>{p.ch}</span>
+              </div>
+              <div className="cost-pill" style={{fontSize:11,marginBottom:4}}>{p.range}</div>
+              <div style={{fontSize:11,color:'#8888aa'}}>💡 {p.start}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {records.length>0&&(
+        <div>
+          <div style={{fontWeight:700,marginBottom:10,fontSize:14}}>📝 最近记录</div>
+          {records.slice(-8).reverse().map(r=>(
+            <div key={r.id} style={{display:'flex',gap:9,padding:'8px 0',borderBottom:'1px solid rgba(255,255,255,0.05)',alignItems:'center',fontSize:12}}>
+              <span style={{color:'#8888aa',flexShrink:0}}>{r.date}</span>
+              <span style={{flex:1}}>{r.ch}</span>
+              {r.note&&<span style={{color:'#666'}}>{r.note}</span>}
+              <span style={{color:'#4ade80',fontWeight:700}}>+¥{Number(r.amount).toLocaleString()}</span>
+              <button onClick={()=>setRecords(records.filter(x=>x.id!==r.id))} style={{background:'none',border:'none',color:'#444',cursor:'pointer'}}>✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════ API SETTINGS ══════════════════ */
+/* 国内 AI 提供商数据 */
+const TEXT_PROVIDERS=[
+  {id:'deepseek',emoji:'🔍',name:'DeepSeek（深度求索）',tag:'🔥国内最强推荐',
+   tip:'效果媲美 GPT-4，价格超低，支持支付宝/微信支付，国内直连无需翻墙',
+   payment:'支持支付宝 / 微信支付',highlight:true,
+   models:[
+     {id:'deepseek-chat',n:'DeepSeek V3 ✨推荐',cny_per10:'¥0.03',note:'10篇文章约¥0.03，超便宜'},
+     {id:'deepseek-reasoner',n:'DeepSeek R1 🧠推理强',cny_per10:'¥0.15',note:'复杂内容/策划类用这个'},
+   ],
+   getUrl:'https://platform.deepseek.com',keyLabel:'DeepSeek API Key',keyPh:'sk-...',
+   modelKey:'deepseekModel',keyField:'deepseek'},
+  {id:'zhipu',emoji:'🧠',name:'智谱AI（GLM）',tag:'🆓有免费版',
+   tip:'GLM-4-Flash 完全免费！新手入门首选，注册即用，国内直连',
+   payment:'支持微信 / 支付宝',highlight:true,
+   models:[
+     {id:'glm-4-flash',n:'GLM-4-Flash 🆓完全免费',cny_per10:'¥0',note:'完全免费，新手首选！'},
+     {id:'glm-4-plus',n:'GLM-4-Plus 💎高质量',cny_per10:'¥0.70',note:'效果更好，超值'},
+   ],
+   getUrl:'https://open.bigmodel.cn',keyLabel:'智谱AI API Key',keyPh:'your-zhipu-key',
+   modelKey:'zhipuModel',keyField:'zhipu'},
+  {id:'moonshot',emoji:'🌙',name:'Moonshot（Kimi）',tag:'💬中文超强',
+   tip:'中文理解最强，新用户有免费额度，支持支付宝',
+   payment:'支持支付宝',highlight:false,
+   models:[
+     {id:'moonshot-v1-8k',n:'Kimi 8K ⚡快速',cny_per10:'¥0.17',note:'日常内容生产'},
+     {id:'moonshot-v1-32k',n:'Kimi 32K 📄长文',cny_per10:'¥0.35',note:'长篇文章专用'},
+   ],
+   getUrl:'https://platform.moonshot.cn',keyLabel:'Moonshot API Key',keyPh:'sk-...',
+   modelKey:'moonshotModel',keyField:'moonshot'},
+  {id:'qwen',emoji:'☁️',name:'通义千问（阿里云）',tag:'🆓有免费额度',
+   tip:'阿里巴巴出品，注册送免费额度，稳定可靠，支持支付宝',
+   payment:'支持支付宝',highlight:false,
+   models:[
+     {id:'qwen-turbo',n:'Qwen Turbo ⚡极速',cny_per10:'¥0.04',note:'批量生产好选择'},
+     {id:'qwen-plus',n:'Qwen Plus ✨均衡',cny_per10:'¥0.12',note:'质量与速度均衡'},
+     {id:'qwen-max',n:'Qwen Max 💎旗舰',cny_per10:'¥0.72',note:'质量最佳'},
+   ],
+   getUrl:'https://bailian.console.aliyun.com',keyLabel:'阿里云 DashScope API Key',keyPh:'sk-...',
+   modelKey:'qwenModel',keyField:'qwen'},
+  {id:'doubao',emoji:'🫘',name:'豆包（火山方舟/字节）',tag:'🇨🇳 国内',
+   tip:'字节跳动出品，同一个Key也可用于即梦AI图片生成，文字+图片一Key搞定',
+   payment:'支持微信 / 支付宝',highlight:false,
+   models:[
+     {id:'doubao-pro-32k',n:'豆包 Pro 32K ✨推荐',cny_per10:'¥0.08',note:'质量稳定，适合内容生产'},
+     {id:'doubao-lite-32k',n:'豆包 Lite 32K ⚡',cny_per10:'¥0.02',note:'速度快，批量生产好选择'},
+   ],
+   getUrl:'https://console.volcengine.com/ark',keyLabel:'火山方舟 API Key',keyPh:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+   modelKey:'doubaoModel',keyField:'doubao'},
+  {id:'claude',emoji:'🤖',name:'Claude（Anthropic）',tag:'🌎境外',
+   tip:'效果顶级，但需要境外信用卡支付，国内用户推荐用上面的国内方案',
+   payment:'需要境外信用卡（不支持国内）',highlight:false,
+   models:[
+     {id:'claude-haiku-4-5-20251001',n:'Haiku 4.5 ⚡最快',cny_per10:'¥1.8',note:'最便宜的Claude'},
+     {id:'claude-sonnet-4-6',n:'Sonnet 4.6 ✨推荐',cny_per10:'¥21',note:'质量最佳'},
+   ],
+   getUrl:'https://console.anthropic.com',keyLabel:'Anthropic API Key',keyPh:'sk-ant-api03-...',
+   modelKey:'claudeModel',keyField:'claude'},
+];
+
+function APISettings({apiKeys,setApiKeys}){
+  const [local,setLocal]=useState({provider:'zhipu',deepseekModel:'deepseek-chat',moonshotModel:'moonshot-v1-8k',zhipuModel:'glm-4-flash',qwenModel:'qwen-turbo',doubaoModel:'doubao-pro-32k',claudeModel:'claude-haiku-4-5-20251001',...apiKeys});
+  const [saved,setSaved]=useState(false);
+  const save=()=>{setApiKeys(local);setSaved(true);setTimeout(()=>setSaved(false),2500);};
+  const cur=local.provider||'deepseek';
+
+  return(
+    <div style={{maxWidth:760,margin:'0 auto'}}>
+      <h2 className="section-title">⚙️ API 设置</h2>
+      <p className="section-sub">选择你能用的 AI 服务配置好就行。所有 Key 只存在你本地浏览器，不会上传到任何地方。</p>
+
+      {/* Step 1: Choose provider */}
+      <div style={{background:'rgba(34,197,94,0.08)',border:'1px solid rgba(34,197,94,0.25)',borderRadius:14,padding:18,marginBottom:18}}>
+        <div style={{fontWeight:700,fontSize:15,marginBottom:4,color:'#4ade80'}}>第一步：选择你用哪个 AI 来写内容</div>
+        <div style={{fontSize:12,color:'#8888aa',marginBottom:14}}>国内用户推荐用 DeepSeek 或 智谱AI，无需翻墙，支付宝可付款</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:9}}>
+          {TEXT_PROVIDERS.map(pv=>(
+            <div key={pv.id} onClick={()=>setLocal({...local,provider:pv.id})}
+              style={{padding:14,borderRadius:12,cursor:'pointer',border:`2px solid ${cur===pv.id?'#22c55e':'rgba(255,255,255,0.08)'}`,
+                background:cur===pv.id?'rgba(34,197,94,0.1)':'rgba(255,255,255,0.03)',transition:'all .2s'}}>
+              <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:6}}>
+                <span style={{fontSize:20}}>{pv.emoji}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,fontSize:13,color:cur===pv.id?'#4ade80':'#e2e2f0'}}>{pv.name}</div>
+                  <span className={`tag ${pv.highlight?'t-gr':'t-pu'}`} style={{fontSize:10,marginTop:2,display:'inline-block'}}>{pv.tag}</span>
+                </div>
+                {cur===pv.id&&<span style={{color:'#4ade80',fontSize:18}}>✓</span>}
+              </div>
+              <div style={{fontSize:11,color:'#666',lineHeight:1.5}}>{pv.tip}</div>
+              <div style={{fontSize:11,color:'#8888aa',marginTop:4}}>💳 {pv.payment}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Step 2: Configure selected provider */}
+      {TEXT_PROVIDERS.filter(pv=>pv.id===cur).map(pv=>(
+        <div key={pv.id} className="card card-warm" style={{padding:20,marginBottom:18}}>
+          <div style={{display:'flex',gap:10,alignItems:'center',marginBottom:16}}>
+            <span style={{fontSize:24}}>{pv.emoji}</span>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,fontSize:15}}>{pv.name}</div>
+              <div style={{fontSize:12,color:'#8888aa',marginTop:2}}>填入 API Key 就能开始生产内容</div>
+            </div>
+            <a href={pv.getUrl} target="_blank" rel="noreferrer"
+              style={{background:'rgba(249,115,22,0.2)',color:'#f97316',padding:'7px 14px',borderRadius:8,fontSize:12,textDecoration:'none',fontWeight:600}}>
+              → 获取 Key（免费注册）
+            </a>
+          </div>
+          <div style={{fontSize:12,color:'#aaa',marginBottom:6}}>{pv.keyLabel}</div>
+          <input type="password" placeholder={pv.keyPh}
+            value={local[pv.keyField]||''}
+            onChange={e=>setLocal({...local,[pv.keyField]:e.target.value})}
+            style={{marginBottom:16}}/>
+          <div style={{fontSize:12,color:'#aaa',marginBottom:10}}>选择模型版本</div>
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {pv.models.map(m=>(
+              <label key={m.id} style={{padding:'12px 14px',borderRadius:11,cursor:'pointer',border:`2px solid ${(local[pv.modelKey]||pv.models[0].id)===m.id?'#f97316':'rgba(255,255,255,0.08)'}`,
+                background:(local[pv.modelKey]||pv.models[0].id)===m.id?'rgba(249,115,22,0.08)':'rgba(255,255,255,0.03)',display:'flex',alignItems:'center',gap:12,transition:'all .15s'}}>
+                <input type="radio" name="aimodel" value={m.id} checked={(local[pv.modelKey]||pv.models[0].id)===m.id}
+                  onChange={()=>setLocal({...local,[pv.modelKey]:m.id})} style={{width:'auto',accentColor:'#f97316'}}/>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:600}}>{m.n}</div>
+                  <div style={{fontSize:11,color:'#8888aa'}}>{m.note}</div>
+                </div>
+                <div className="cost-pill" style={{fontSize:11,whiteSpace:'nowrap'}}>{m.cny_per10}/10篇</div>
+              </label>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* Step 3: Optional tools */}
+      <div style={{fontWeight:700,fontSize:14,marginBottom:12,color:'#8888aa'}}>第三步：选填——图片/视频/分发工具（不影响写内容）</div>
+      {['🎨 AI图片','🎬 AI视频','🎵 AI音乐','📡 内容分发','📊 数据分析'].map(cat=>(
+        <div key={cat} style={{marginBottom:14}}>
+          <div style={{fontSize:12,fontWeight:600,color:'#666',marginBottom:8}}>{cat}</div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            {API_CATALOG.filter(a=>a.cat===cat).map(tool=>(
+              <div key={tool.id} className="card" style={{padding:14}}>
+                <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:8}}>
+                  <span style={{fontSize:16}}>{tool.emoji}</span>
+                  <div style={{flex:1}}>
+                    <div style={{fontWeight:600,fontSize:12,color:'#e2e2f0'}}>{tool.name}</div>
+                    <span className={`tag ${tool.domestic?'t-bl':'t-pu'}`} style={{fontSize:9}}>{tool.domestic?'🇨🇳 国内':'🌎 国际'}</span>
+                  </div>
+                  <a href={tool.getUrl} target="_blank" rel="noreferrer" style={{color:'#f97316',fontSize:11,textDecoration:'none'}}>→</a>
+                </div>
+                <input type="password" placeholder={tool.keyPh} value={local[tool.id]||''} onChange={e=>setLocal({...local,[tool.id]:e.target.value})} style={{fontSize:12,padding:'7px 10px',marginBottom:6}}/>
+                {tool.models.map(m=>(
+                  <div key={m.id} className="api-cost-row">
+                    <span style={{fontSize:11,color:'#8888aa'}}>{m.n}</span>
+                    <span className="cost-pill" style={{fontSize:10}}>{m.note}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div style={{display:'flex',gap:12,alignItems:'center',padding:'16px 0 40px'}}>
+        <button className="btn btn-primary" onClick={save}>{saved?'✅ 已保存！':'💾 保存所有设置'}</button>
+        <span style={{fontSize:12,color:'#8888aa'}}>🔒 所有 Key 只存在你的浏览器本地，不会上传</span>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════ MAIN APP ══════════════════ */
+function App(){
+  const [page,setPage]=useState('home');
+  const [persona,setPersona]=useState(()=>LS.g('persona_v3',null));
+  const [topics,setTopics]=useState(()=>LS.g('topics_v3',[]));
+  const [history,setHistory]=useState(()=>LS.g('history_v3',[]));
+  const [apiKeys,setApiKeys]=useState(()=>LS.g('apikeys_v3',{
+    provider:'zhipu',
+    zhipu:'088b90c3b6944b3493000fe0c1bc57be.KzqPXHyB1kOXwQnA',
+    zhipuModel:'glm-4-flash',
+    moonshot:'sk-DmSa0kIwRrbhz5pZNvN1ibW8XMRvYDD0DEJ1B4yuXMMIoRcI',
+    moonshotModel:'moonshot-v1-8k',
+    doubao:'f45f405d-4706-433e-8b2a-d995d52d39a1',
+    doubaoModel:'doubao-pro-32k',
+    deepseek:'',
+    deepseekModel:'deepseek-chat',
+    qwen:'',
+    qwenModel:'qwen-turbo',
+    claude:'',
+    claudeModel:'claude-haiku-4-5-20251001',
+    jimeng:'f45f405d-4706-433e-8b2a-d995d52d39a1',
+  }));
+  const [done,setDone]=useState(()=>LS.g('done_v3',[]));
+
+  useEffect(()=>LS.s('persona_v3',persona),[persona]);
+  useEffect(()=>LS.s('topics_v3',topics),[topics]);
+  useEffect(()=>LS.s('history_v3',history),[history]);
+  useEffect(()=>LS.s('apikeys_v3',apiKeys),[apiKeys]);
+  useEffect(()=>LS.s('done_v3',done),[done]);
+
+  const markDone=id=>{if(!done.includes(id))setDone(p=>[...p,id]);};
+  const savePersona=p=>{setPersona(p);markDone('ip');};
+  const saveHistory=item=>setHistory(p=>[...p.slice(-499),item]);
+  const go=id=>{setPage(id);window.scrollTo(0,0);};
+
+  const render=()=>{
+    switch(page){
+      case 'home': return <Home setPage={go} persona={persona} done={done} history={history}/>;
+      case 'ip':   return <IPWizard persona={persona} setPersona={savePersona} apiKeys={apiKeys} onDone={()=>{markDone('ip');go('account');}}/>;
+      case 'account': return <AccountSetup persona={persona} apiKeys={apiKeys}/>;
+      case 'topics':  return <Topics persona={persona} apiKeys={apiKeys} topics={topics} setTopics={t=>{setTopics(t);markDone('topics');}}/>;
+      case 'factory': return <Factory persona={persona} topics={topics} apiKeys={apiKeys} onSave={item=>{saveHistory(item);markDone('factory');}}/>;
+      case 'publish': return <Publish/>;
+      case 'analytics': return <Analytics/>;
+      case 'optimize':  return <Optimize history={history} persona={persona} apiKeys={apiKeys}/>;
+      case 'monetize':  return <Monetize/>;
+      case 'apis': return <APISettings apiKeys={apiKeys} setApiKeys={k=>{setApiKeys(k);LS.s('apikeys_v3',k);}}/>;
+      default: return null;
+    }
+  };
+
+  return(
+    <div style={{display:'flex',minHeight:'100vh'}}>
+      <Sidebar page={page} setPage={go} persona={persona} apiKeys={apiKeys} done={done}/>
+      <div className="main">
+        <div style={{maxWidth:860,margin:'0 auto',padding:'30px 24px'}}>
+          {render()}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App/>,document.getElementById('root'));
+</script>
+</body>
+</html>
