@@ -1,0 +1,10 @@
+.DS_Store
+.codex/
+__MACOSX/
+chrome-devtools-mcp/
+xhs-mcp-qoder-zeroenv-pack-macos-universal-20260325-macos/
+node_modules/
+.env
+.env.local
+.env.production
+supabase/.temp/
