@@ -20,3 +20,22 @@ export async function createAccount(payload: Omit<Account, "id" | "created_at">)
   if (error) throw error;
   return data;
 }
+
+export async function sumDailyLimit(personaId: string) {
+  const supabase = getServerSupabase();
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("daily_limit")
+    .eq("persona_id", personaId);
+  if (error) throw error;
+  return (data ?? []).reduce((sum, row) => sum + (row.daily_limit ?? 0), 0);
+}
+
+export async function updatePersonaLimit(personaId: string, dailyLimit: number) {
+  const supabase = getServerSupabase();
+  const { error } = await supabase
+    .from("accounts")
+    .update({ daily_limit: dailyLimit })
+    .eq("persona_id", personaId);
+  if (error) throw error;
+}

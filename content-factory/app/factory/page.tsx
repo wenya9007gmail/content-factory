@@ -4,6 +4,8 @@ import PipelineProgress from "@/components/factory/PipelineProgress";
 import TopicTable from "@/components/factory/TopicTable";
 import PersonaSelector from "@/components/factory/PersonaSelector";
 import CostBanner from "@/components/cost/CostBanner";
+import UsageCard from "@/components/cost/UsageCard";
+import ProviderLimitsForm from "@/components/cost/ProviderLimitsForm";
 
 async function loadData() {
   const personas = await listPersonas();
@@ -17,6 +19,12 @@ export default async function FactoryPage() {
   return (
     <div className="min-h-screen bg-[#03030b] text-zinc-100 p-6 space-y-6">
       <CostBanner personaId={persona?.id} />
+      {persona && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UsageCard personaId={persona.id} />
+          <ProviderLimitsForm personaId={persona.id} />
+        </div>
+      )}
       <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 space-y-6">
         <div className="flex justify-between items-center">
           <div>
