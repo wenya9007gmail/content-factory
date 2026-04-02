@@ -11,12 +11,20 @@ export default function Home() {
         <p className="text-sm text-zinc-400">
           你的八步内容流水线：IP定位 → 账号搭建 → 选题库 → 内容工厂 → 发布 → 数据 → 自动优化 → 变现追踪
         </p>
-        <Link
-          href="/factory.html"
-          className="rounded-full bg-gradient-to-r from-orange-400 to-pink-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/30 transition hover:translate-y-0.5"
-        >
-          进入系统 →
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/dashboard"
+            className="rounded-full bg-gradient-to-r from-orange-400 to-pink-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/30 transition hover:translate-y-0.5"
+          >
+            打开 Dashboard
+          </Link>
+          <Link
+            href="/factory"
+            className="rounded-full border border-white/30 px-8 py-3 text-sm font-semibold text-white/80 hover:text-white hover:border-white"
+          >
+            进入内容工厂
+          </Link>
+        </div>
         <div className="text-xs text-zinc-500">
           已接入后端代理，可在 Vercel 部署并安全调用国内/海外 AI API
         </div>
