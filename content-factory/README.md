@@ -28,3 +28,4 @@ npm run dev
 2. 运行 `npm install`（或 `pnpm install`）同步依赖。
 3. 执行 `npm run dev`，浏览器访问 `http://localhost:3000`。
 4. 产品范围与演进请参考 `docs/superpowers/specs/2026-04-01-content-factory-design.md`。
+5. 如需抓取发布后的指标并触发自动学习，运行 `npm run fetch:metrics`（需要 `SUPABASE_SERVICE_ROLE_KEY`）。

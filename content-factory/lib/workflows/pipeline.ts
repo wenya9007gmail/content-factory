@@ -29,7 +29,7 @@ export async function runPipeline(taskId: string) {
   });
 
   await updateTask(task.id, {
-    status: "done",
+    status: "awaiting_metrics",
     current_step: task.steps.length,
     cost_actual_cents: Math.round(cost * 100),
   });
