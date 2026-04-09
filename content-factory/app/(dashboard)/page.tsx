@@ -1,5 +1,4 @@
 import { listPersonas } from "@/lib/repositories/personas";
-import { listAccounts } from "@/lib/repositories/accounts";
 import { getServerSupabase } from "@/lib/supabase/server";
 
 async function getStats() {

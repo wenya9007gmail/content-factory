@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { insertTopic, listTopics } from "@/lib/repositories/topics";
+import { insertTopic } from "@/lib/repositories/topics";
 import { tavilySearch } from "@/lib/mcp/tavily";
 
 const schema = z.object({

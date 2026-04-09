@@ -1,3 +1,8 @@
+type TavilyResponse = {
+  summary?: string;
+  results?: Array<{ url?: string }>;
+};
+
 export async function tavilySearch(query: string) {
   const apiKey = process.env.TAVILY_API_KEY;
   if (!apiKey) {
@@ -14,9 +19,13 @@ export async function tavilySearch(query: string) {
   if (!res.ok) {
     return { summary: "Tavily 请求失败", links: [] };
   }
-  const data = await res.json();
+  const data = (await res.json()) as TavilyResponse;
+  const links =
+    data.results
+      ?.map((item) => item.url)
+      .filter((url): url is string => typeof url === "string" && url.length > 0) ?? [];
   return {
     summary: data.summary ?? "",
-    links: data.results?.map((item: any) => item.url) ?? [],
+    links,
   };
 }

@@ -1,4 +1,7 @@
 import { getServiceSupabase } from "@/lib/supabase/service";
+import type { Database } from "@/lib/types";
+
+type PersonaRow = Database["public"]["Tables"]["personas"]["Row"];
 
 export async function applyLearning(taskId: string) {
   const supabase = getServiceSupabase();
@@ -30,11 +33,23 @@ export async function applyLearning(taskId: string) {
     .update({ priority: (metric.impressions ?? 0) + priorityBoost })
     .eq("id", task.topic_id);
 
+  const { data: persona } = await supabase
+    .from("personas")
+    .select("tone")
+    .eq("id", task.persona_id)
+    .single();
+
+  const personaToneValue = persona?.tone as PersonaRow["tone"];
+  const baseTone =
+    personaToneValue && typeof personaToneValue === "object"
+      ? (personaToneValue as Record<string, unknown>)
+      : {};
+
   await supabase
     .from("personas")
     .update({
       tone: {
-        ...((task as any).tone ?? {}),
+        ...baseTone,
         last_success: metric.impressions,
       },
     })
