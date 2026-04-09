@@ -1,0 +1,3 @@
+[submodule "content-factory"]
+	path = content-factory
+	url = https://github.com/wenya9007gmail/content-factory.git
