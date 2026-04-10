@@ -23,5 +23,22 @@ npm run dev
 
 部署到 Vercel 后，API Key 由前端输入、后端代理 `/api/proxy` 转发，避免敏感信息暴露。
 
-## 仓库说明
-`content-factory/` 目录已直接纳入本仓库版本控制，不再使用 Git submodule。上传或镜像仓库时请直接推送整个仓库内容，避免只带出子模块指针导致代码不完整。
+## Setup
+1. 复制 `.env.example` → `.env.local`，填入 Supabase、AI Provider、MCP 等密钥。
+2. 运行 `npm install`（或 `pnpm install`）同步依赖。
+3. 执行 `npm run dev`，浏览器访问 `http://localhost:3000`。
+4. 产品范围与演进请参考 `docs/superpowers/specs/2026-04-01-content-factory-design.md`。
+5. 如需抓取发布后的指标并触发自动学习，运行 `npm run fetch:metrics`（需要 `SUPABASE_SERVICE_ROLE_KEY`）。
+
+## CI/CD
+GitHub Actions workflow `.github/workflows/deploy.yml` 会在 push 时执行 lint/build、`supabase db push` 以及 Vercel 部署。请在仓库 Secrets 中配置：
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_DB_PASSWORD`
+- `SUPABASE_ACCESS_TOKEN`
+- `TAVILY_API_KEY` / `EXA_API_KEY`（可选）
+- `ZHIPU_BASE_URL`
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
