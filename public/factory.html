@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>å¨ååå®¹å·¥å</title>
+  <title>全域内容工厂</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -48,28 +48,28 @@
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback } = React;
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Constants
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 const IS_HOSTED = window.location.protocol !== 'file:';
 const GUEST_LIMIT = 2;
 const NAV_ITEMS = [
-  { id: 'home',    label: 'é¦é¡µ',     icon: 'ð ' },
-  { id: 'monitor', label: 'éé¢çæ§', icon: 'ð¡' },
-  { id: 'factory', label: 'åå®¹å·¥å', icon: 'ð­' },
-  { id: 'publish', label: 'åå¸ç®¡ç', icon: 'ð¤' },
-  { id: 'analytics',label: 'æ°æ®åæ',icon: 'ð' },
-  { id: 'ip',      label: 'IPæé ',   icon: 'â¨' },
-  { id: 'account', label: 'è´¦å·ç®¡ç', icon: 'ð¤' },
-  { id: 'topics',  label: 'éé¢åº',   icon: 'ð¡' },
-  { id: 'optimize',label: 'åå®¹ä¼å', icon: 'ð§' },
-  { id: 'monetize',label: 'åç°ç®¡ç', icon: 'ð°' },
-  { id: 'apis',    label: 'APIéç½®',  icon: 'ð' },
+  { id: 'home',    label: '首页',     icon: '🏠' },
+  { id: 'monitor', label: '选题监控', icon: '📡' },
+  { id: 'factory', label: '内容工厂', icon: '🏭' },
+  { id: 'publish', label: '发布管理', icon: '📤' },
+  { id: 'analytics',label: '数据分析',icon: '📊' },
+  { id: 'ip',      label: 'IP打造',   icon: '✨' },
+  { id: 'account', label: '账号管理', icon: '👤' },
+  { id: 'topics',  label: '选题库',   icon: '💡' },
+  { id: 'optimize',label: '内容优化', icon: '🔧' },
+  { id: 'monetize',label: '变现管理', icon: '💰' },
+  { id: 'apis',    label: 'API配置',  icon: '🔑' },
 ];
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Session & Storage Helpers
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function getSessionId() {
   let id = localStorage.getItem('cf_session_id');
   if (!id) {
@@ -95,18 +95,18 @@ function loadContentHistory() {
 }
 function saveContentHistory(items) { localStorage.setItem('cf_content_history', JSON.stringify(items)); }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  API Helpers
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 async function apiCall(endpoint, body) {
-  if (!IS_HOSTED) return { error: 'æ¬å°æ¨¡å¼ä¸æ¯ææ­¤åè½ï¼è¯·è®¿é®çº¿ä¸çæ¬' };
+  if (!IS_HOSTED) return { error: '本地模式不支持此功能，请访问线上版本' };
   try {
     const res = await fetch(`/api/${endpoint}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
     return res.json();
-  } catch (e) { return { error: e.message || 'ç½ç»éè¯¯' }; }
+  } catch (e) { return { error: e.message || '网络错误' }; }
 }
 
 async function checkUsage(sessionId) {
@@ -134,9 +134,9 @@ async function callAI(params) {
   return apiCall('proxy', params);
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Auth Gate Component
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function AuthGate({ onAuth }) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -144,7 +144,7 @@ function AuthGate({ onAuth }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!code.trim()) { setError('è¯·è¾å¥ææç '); return; }
+    if (!code.trim()) { setError('请输入授权码'); return; }
     setLoading(true); setError('');
     if (!IS_HOSTED) {
       onAuth({ type: 'owner', code: code.trim() });
@@ -153,7 +153,7 @@ function AuthGate({ onAuth }) {
     const res = await verifyAuth(code.trim());
     setLoading(false);
     if (res.valid) { saveAuth({ type: res.type, code: code.trim() }); onAuth({ type: res.type, code: code.trim() }); }
-    else setError(res.message || 'ææç æ æ');
+    else setError(res.message || '授权码无效');
   }
 
   function handleGuest() {
@@ -164,53 +164,53 @@ function AuthGate({ onAuth }) {
   return (
     <div className="modal-backdrop">
       <div className="modal-box" style={{textAlign:'center'}}>
-        <div style={{fontSize:48,marginBottom:12}}>ð­</div>
-        <h2 style={{fontSize:24,fontWeight:700,marginBottom:6}} className="gradient-text">å¨ååå®¹å·¥å</h2>
-        <p style={{color:'#64748b',marginBottom:28,fontSize:14}}>æ¨çä¸ç«å¼åå®¹åä½ä¸åå¸å¹³å°</p>
+        <div style={{fontSize:48,marginBottom:12}}>🏭</div>
+        <h2 style={{fontSize:24,fontWeight:700,marginBottom:6}} className="gradient-text">全域内容工厂</h2>
+        <p style={{color:'#64748b',marginBottom:28,fontSize:14}}>您的一站式内容创作与发布平台</p>
         <form onSubmit={handleSubmit}>
           <input
             className="input-base" style={{textAlign:'center',marginBottom:10}}
-            placeholder="è¾å¥ææç ï¼å¢éæåï¼"
+            placeholder="输入授权码（团队成员）"
             value={code} onChange={e => setCode(e.target.value)}
           />
           {error && <p style={{color:'#ef4444',fontSize:13,marginBottom:8}}>{error}</p>}
           <button type="submit" className="btn-primary" disabled={loading}
             style={{width:'100%',padding:'10px',borderRadius:8,fontSize:15,fontWeight:600,marginBottom:10}}>
-            {loading ? <span className="spinner"/> : 'è¿å¥å¹³å°'}
+            {loading ? <span className="spinner"/> : '进入平台'}
           </button>
         </form>
         <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
           <hr style={{flex:1,border:'none',borderTop:'1px solid #e2e8f0'}}/>
-          <span style={{color:'#94a3b8',fontSize:13}}>æè</span>
+          <span style={{color:'#94a3b8',fontSize:13}}>或者</span>
           <hr style={{flex:1,border:'none',borderTop:'1px solid #e2e8f0'}}/>
         </div>
         <button className="btn-secondary" onClick={handleGuest}
           style={{width:'100%',padding:'10px',borderRadius:8,fontSize:14}}>
-          åè´¹ä½éªï¼{GUEST_LIMIT} æ¬¡ï¼
+          免费体验（{GUEST_LIMIT} 次）
         </button>
         <p style={{color:'#94a3b8',fontSize:12,marginTop:16}}>
-          èç³»è¿è¥è·åææç ä»¥è§£éæ éä½¿ç¨
+          联系运营获取授权码以解锁无限使用
         </p>
       </div>
     </div>
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Usage Gate Wrapper
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function UsageGate({ auth, usage, onNeedAuth, children }) {
   if (auth.type !== 'guest') return children;
   if (usage.used >= GUEST_LIMIT) {
     return (
       <div className="modal-backdrop">
         <div className="modal-box" style={{textAlign:'center'}}>
-          <div style={{fontSize:48,marginBottom:12}}>ð</div>
-          <h3 style={{fontSize:20,fontWeight:700,marginBottom:8}}>åè´¹æ¬¡æ°å·²ç¨å®</h3>
-          <p style={{color:'#64748b',marginBottom:24}}>æ¨å·²ä½¿ç¨ {GUEST_LIMIT} æ¬¡åè´¹ä½éªï¼è¯·è¾å¥ææç ç»§ç»­ä½¿ç¨å®æ´åè½ã</p>
+          <div style={{fontSize:48,marginBottom:12}}>🔒</div>
+          <h3 style={{fontSize:20,fontWeight:700,marginBottom:8}}>免费次数已用完</h3>
+          <p style={{color:'#64748b',marginBottom:24}}>您已使用 {GUEST_LIMIT} 次免费体验，请输入授权码继续使用完整功能。</p>
           <button className="btn-primary" onClick={onNeedAuth}
             style={{padding:'10px 32px',borderRadius:8,fontSize:15,fontWeight:600}}>
-            è¾å¥ææç 
+            输入授权码
           </button>
         </div>
       </div>
@@ -219,41 +219,41 @@ function UsageGate({ auth, usage, onNeedAuth, children }) {
   return children;
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Header Component
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function Header({ auth, usage, onLogout }) {
   const isGuest = auth.type === 'guest';
   const usedPct = isGuest ? (usage.used / GUEST_LIMIT) * 100 : 100;
   return (
     <div style={{background:'linear-gradient(135deg,#6366f1,#8b5cf6)',padding:'0 20px',height:56,display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,zIndex:50}}>
       <div style={{display:'flex',alignItems:'center',gap:10}}>
-        <span style={{fontSize:22}}>ð­</span>
-        <span style={{color:'#fff',fontWeight:700,fontSize:18}}>å¨ååå®¹å·¥å</span>
-        {!IS_HOSTED && <span style={{background:'rgba(255,255,255,.2)',color:'#fff',padding:'2px 8px',borderRadius:999,fontSize:11}}>æ¬å°æ¨¡å¼</span>}
+        <span style={{fontSize:22}}>🏭</span>
+        <span style={{color:'#fff',fontWeight:700,fontSize:18}}>全域内容工厂</span>
+        {!IS_HOSTED && <span style={{background:'rgba(255,255,255,.2)',color:'#fff',padding:'2px 8px',borderRadius:999,fontSize:11}}>本地模式</span>}
       </div>
       <div style={{display:'flex',alignItems:'center',gap:14}}>
         {isGuest ? (
           <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <span style={{color:'rgba(255,255,255,.8)',fontSize:13}}>åè´¹ä½éª {usage.used}/{GUEST_LIMIT}</span>
+            <span style={{color:'rgba(255,255,255,.8)',fontSize:13}}>免费体验 {usage.used}/{GUEST_LIMIT}</span>
             <div style={{width:60}} className="usage-bar">
               <div className="usage-fill" style={{width:`${usedPct}%`}}/>
             </div>
           </div>
         ) : (
           <span style={{background:'rgba(255,255,255,.2)',color:'#fff',padding:'2px 10px',borderRadius:999,fontSize:12,fontWeight:500}}>
-            {auth.type === 'owner' ? 'ð Owner' : 'ð¥ Team'}
+            {auth.type === 'owner' ? '👑 Owner' : '👥 Team'}
           </span>
         )}
-        <button onClick={onLogout} style={{background:'rgba(255,255,255,.15)',color:'#fff',border:'none',padding:'5px 12px',borderRadius:8,cursor:'pointer',fontSize:13}}>éåº</button>
+        <button onClick={onLogout} style={{background:'rgba(255,255,255,.15)',color:'#fff',border:'none',padding:'5px 12px',borderRadius:8,cursor:'pointer',fontSize:13}}>退出</button>
       </div>
     </div>
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Sidebar Nav
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function Sidebar({ page, onPage }) {
   return (
     <div style={{width:200,background:'linear-gradient(180deg,#4f46e5,#7c3aed)',minHeight:'calc(100vh - 56px)',padding:'12px 8px',flexShrink:0}}>
@@ -269,9 +269,9 @@ function Sidebar({ page, onPage }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
-//  Monitor Page (éé¢çæ§)
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
+//  Monitor Page (选题监控)
+// ─────────────────────────────────────────────
 function MonitorPage({ auth, usage, onUsed }) {
   const [platform, setPlatform] = useState('wechat');
   const [keyword, setKeyword] = useState('');
@@ -284,13 +284,13 @@ function MonitorPage({ auth, usage, onUsed }) {
   const [page, setPage] = useState(1);
 
   async function handleSearch(kw = keyword, pg = 1) {
-    if (!kw.trim()) { setError('è¯·è¾å¥å³é®è¯'); return; }
-    if (!IS_HOSTED) { setError('æ¬å°æ¨¡å¼ä¸æ¯ææ­¤åè½'); return; }
+    if (!kw.trim()) { setError('请输入关键词'); return; }
+    if (!IS_HOSTED) { setError('本地模式不支持此功能'); return; }
 
     // Usage check for guests
     if (auth.type === 'guest') {
       const check = await checkUsage(getSessionId());
-      if (!check.allowed) { setError('åè´¹æ¬¡æ°å·²ç¨å®ï¼è¯·è·åææç '); return; }
+      if (!check.allowed) { setError('免费次数已用完，请获取授权码'); return; }
     }
 
     setLoading(true); setError(''); setPage(pg);
@@ -326,41 +326,41 @@ function MonitorPage({ auth, usage, onUsed }) {
   return (
     <div style={{padding:24,maxWidth:1100,margin:'0 auto'}}>
       <div style={{marginBottom:20}}>
-        <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>ð¡ éé¢çæ§</h2>
-        <p style={{color:'#64748b',fontSize:14}}>å®æ¶çæ§å¾®ä¿¡å¬ä¼å·åå°çº¢ä¹¦çç­é¨åå®¹ï¼åç°çæ¬¾éé¢</p>
+        <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>📡 选题监控</h2>
+        <p style={{color:'#64748b',fontSize:14}}>实时监控微信公众号和小红书的热门内容，发现爆款选题</p>
       </div>
 
       {/* Search Bar */}
       <div className="card" style={{padding:20,marginBottom:16}}>
         <div style={{display:'flex',gap:8,marginBottom:12}}>
           <div className="platform-tab" onClick={()=>setPlatform('wechat')} style={{...platform==='wechat'?{background:'#6366f1',color:'#fff'}:{color:'#64748b'}}}>
-            ð° å¾®ä¿¡å¬ä¼å·
+            📰 微信公众号
           </div>
           <div className="platform-tab" onClick={()=>setPlatform('xhs')} style={{...platform==='xhs'?{background:'#ff2442',color:'#fff'}:{color:'#64748b'}}}>
-            ð± å°çº¢ä¹¦
+            📱 小红书
           </div>
         </div>
         <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-          <input className="input-base" style={{flex:1,minWidth:200}} placeholder="è¾å¥å³é®è¯ï¼å¦ï¼å¯ä¸èµé±ãå¥èº«åè¥..."
+          <input className="input-base" style={{flex:1,minWidth:200}} placeholder="输入关键词，如：副业赚钱、健身减肥..."
             value={keyword} onChange={e=>setKeyword(e.target.value)}
             onKeyDown={e=>e.key==='Enter'&&handleSearch()} />
           {platform === 'wechat' ? (
             <select className="input-base" style={{width:120}} value={period} onChange={e=>setPeriod(Number(e.target.value))}>
-              <option value={1}>è¿1å¤©</option>
-              <option value={3}>è¿3å¤©</option>
-              <option value={7}>è¿7å¤©</option>
-              <option value={30}>è¿30å¤©</option>
+              <option value={1}>近1天</option>
+              <option value={3}>近3天</option>
+              <option value={7}>近7天</option>
+              <option value={30}>近30天</option>
             </select>
           ) : (
             <select className="input-base" style={{width:150}} value={sort} onChange={e=>setSort(e.target.value)}>
-              <option value="comment_descending">æè¯è®ºæåº</option>
-              <option value="likes_descending">æç¹èµæåº</option>
-              <option value="time_descending">ææ¶é´æåº</option>
+              <option value="comment_descending">按评论排序</option>
+              <option value="likes_descending">按点赞排序</option>
+              <option value="time_descending">按时间排序</option>
             </select>
           )}
           <button className="btn-primary" onClick={()=>handleSearch()} disabled={loading}
             style={{padding:'8px 20px',borderRadius:8,fontWeight:600,minWidth:80}}>
-            {loading ? <span className="spinner"/> : 'ð æç´¢'}
+            {loading ? <span className="spinner"/> : '🔍 搜索'}
           </button>
         </div>
         {error && <p style={{color:'#ef4444',fontSize:13,marginTop:8}}>{error}</p>}
@@ -369,12 +369,12 @@ function MonitorPage({ auth, usage, onUsed }) {
       {/* Saved Keywords */}
       {savedKeywords.length > 0 && (
         <div style={{marginBottom:16,display:'flex',flexWrap:'wrap',gap:6,alignItems:'center'}}>
-          <span style={{color:'#64748b',fontSize:13,marginRight:4}}>åå²å³é®è¯ï¼</span>
+          <span style={{color:'#64748b',fontSize:13,marginRight:4}}>历史关键词：</span>
           {savedKeywords.map(kw => (
             <span key={kw} style={{background:'#f1f5f9',border:'1.5px solid #e2e8f0',borderRadius:999,padding:'3px 10px',fontSize:13,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:4}}
               onClick={()=>{setKeyword(kw);handleSearch(kw);}}>
               {kw}
-              <span onClick={e=>{e.stopPropagation();removeKeyword(kw);}} style={{color:'#94a3b8',fontSize:11}}>â</span>
+              <span onClick={e=>{e.stopPropagation();removeKeyword(kw);}} style={{color:'#94a3b8',fontSize:11}}>✕</span>
             </span>
           ))}
         </div>
@@ -385,15 +385,15 @@ function MonitorPage({ auth, usage, onUsed }) {
         <div>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
             <span style={{color:'#64748b',fontSize:14}}>
-              åæ¾å° <strong style={{color:'#1e293b'}}>{results.total || results.items?.length || 0}</strong> æ¡ç»æ
-              {results.total_page > 1 && ` Â· ç¬¬ ${page}/${results.total_page} é¡µ`}
+              兕找到 <strong style={{color:'#1e293b'}}>{results.total || results.items?.length || 0}</strong> 条结果
+              {results.total_page > 1 && ` · 第 ${page}/${results.total_page} 页`}
             </span>
             {results.total_page > 1 && (
               <div style={{display:'flex',gap:6}}>
                 <button className="btn-secondary" style={{padding:'4px 12px',borderRadius:6,fontSize:13}} disabled={page<=1}
-                  onClick={()=>handleSearch(keyword,page-1)}>ä¸ä¸é¡µ</button>
+                  onClick={()=>handleSearch(keyword,page-1)}>上一页</button>
                 <button className="btn-secondary" style={{padding:'4px 12px',borderRadius:6,fontSize:13}} disabled={page>=results.total_page}
-                  onClick={()=>handleSearch(keyword,page+1)}>ä¸ä¸é¡µ</button>
+                  onClick={()=>handleSearch(keyword,page+1)}>下一页</button>
               </div>
             )}
           </div>
@@ -406,21 +406,21 @@ function MonitorPage({ auth, usage, onUsed }) {
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{fontWeight:600,fontSize:15,marginBottom:4,cursor:'pointer',color:'#1e293b'}}
                       onClick={()=>item.url&&window.open(item.url,'_blank')} title={item.title}>
-                      {item.is_original && <span className="tag" style={{background:'#fef3c7',color:'#d97706',marginRight:6,fontSize:11}}>åå</span>}
+                      {item.is_original && <span className="tag" style={{background:'#fef3c7',color:'#d97706',marginRight:6,fontSize:11}}>原创</span>}
                       {item.title}
                     </div>
                     {item.content && <p style={{color:'#64748b',fontSize:13,margin:'0 0 8px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.content}</p>}
                     <div style={{display:'flex',flexWrap:'wrap',gap:16,fontSize:12,color:'#94a3b8'}}>
-                      <span>ð° {item.wx_name}</span>
-                      {item.read > 0 && <span>ð {item.read >= 10000 ? (item.read/10000).toFixed(1)+'w' : item.read}</span>}
-                      {item.praise > 0 && <span>ð {item.praise}</span>}
-                      {item.looking > 0 && <span>ð¬ {item.looking}</span>}
-                      {item.publish_time_str && <span>ð {item.publish_time_str}</span>}
-                      {item.ip_wording && <span>ð {item.ip_wording}</span>}
+                      <span>📰 {item.wx_name}</span>
+                      {item.read > 0 && <span>👁 {item.read >= 10000 ? (item.read/10000).toFixed(1)+'w' : item.read}</span>}
+                      {item.praise > 0 && <span>👍 {item.praise}</span>}
+                      {item.looking > 0 && <span>💬 {item.looking}</span>}
+                      {item.publish_time_str && <span>📅 {item.publish_time_str}</span>}
+                      {item.ip_wording && <span>📍 {item.ip_wording}</span>}
                     </div>
                   </div>
                   <button className="btn-secondary" style={{padding:'4px 10px',borderRadius:6,fontSize:12,flexShrink:0}}
-                    onClick={()=>copyText(item.title)}>å¤å¶æ é¢</button>
+                    onClick={()=>copyText(item.title)}>复制标题</button>
                 </div>
               </div>
             ))
@@ -437,17 +437,17 @@ function MonitorPage({ auth, usage, onUsed }) {
                   <div style={{fontWeight:600,fontSize:14,marginBottom:6,color:'#1e293b',overflow:'hidden',display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical'}}>{item.title||item.desc}</div>
                   {item.desc && item.title && <p style={{color:'#64748b',fontSize:12,marginBottom:8,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.desc}</p>}
                   <div style={{display:'flex',gap:12,fontSize:12,color:'#94a3b8',flexWrap:'wrap'}}>
-                    {item.liked_count > 0 && <span>â¤ï¸ {item.liked_count >= 10000 ? (item.liked_count/10000).toFixed(1)+'w' : item.liked_count}</span>}
-                    {item.comments_count > 0 && <span>ð¬ {item.comments_count}</span>}
-                    {item.collected_count > 0 && <span>â­ {item.collected_count}</span>}
-                    {item.shared_count > 0 && <span>â {item.shared_count}</span>}
+                    {item.liked_count > 0 && <span>❤️ {item.liked_count >= 10000 ? (item.liked_count/10000).toFixed(1)+'w' : item.liked_count}</span>}
+                    {item.comments_count > 0 && <span>💬 {item.comments_count}</span>}
+                    {item.collected_count > 0 && <span>⭐ {item.collected_count}</span>}
+                    {item.shared_count > 0 && <span>↗ {item.shared_count}</span>}
                   </div>
                   <div style={{marginTop:8,display:'flex',alignItems:'center',gap:6}}>
                     {item.user_avatar && <img src={item.user_avatar} alt="" style={{width:20,height:20,borderRadius:10,objectFit:'cover'}} onError={e=>e.target.style.display='none'}/>}
                     <span style={{fontSize:12,color:'#64748b'}}>{item.user_nickname}</span>
                   </div>
                   <button className="btn-secondary" style={{marginTop:8,padding:'4px 10px',borderRadius:6,fontSize:12,width:'100%'}}
-                    onClick={e=>{e.stopPropagation();copyText(item.title||item.desc);}}>å¤å¶æ é¢</button>
+                    onClick={e=>{e.stopPropagation();copyText(item.title||item.desc);}}>复制标题</button>
                 </div>
               ))}
             </div>
@@ -455,8 +455,8 @@ function MonitorPage({ auth, usage, onUsed }) {
 
           {results.items?.length === 0 && (
             <div style={{textAlign:'center',color:'#94a3b8',padding:48}}>
-              <div style={{fontSize:48,marginBottom:12}}>ð</div>
-              <p>æªæ¾å°ç¸å³åå®¹ï¼æ¢ä¸ªå³é®è¯è¯è¯</p>
+              <div style={{fontSize:48,marginBottom:12}}>🔍</div>
+              <p>未找到相关内容，换个关键词试试</p>
             </div>
           )}
         </div>
@@ -464,18 +464,18 @@ function MonitorPage({ auth, usage, onUsed }) {
 
       {!results && !loading && (
         <div className="card" style={{padding:48,textAlign:'center'}}>
-          <div style={{fontSize:56,marginBottom:16}}>ð¡</div>
-          <p style={{color:'#64748b',fontSize:16}}>è¾å¥å³é®è¯ï¼çæ§å¾®ä¿¡åå°çº¢ä¹¦çç­é¨åå®¹</p>
-          <p style={{color:'#94a3b8',fontSize:13,marginTop:8}}>åç°çæ¬¾éé¢ï¼å©ååå®¹åä½</p>
+          <div style={{fontSize:56,marginBottom:16}}>📡</div>
+          <p style={{color:'#64748b',fontSize:16}}>输入关键词，监控微信和小红书的热门内容</p>
+          <p style={{color:'#94a3b8',fontSize:13,marginTop:8}}>发现爆款选题，助力内容创作</p>
         </div>
       )}
     </div>
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  WeChat Publish Modal
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function WechatPublishModal({ content, onClose }) {
   const [accounts, setAccounts] = useState([]);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
@@ -494,15 +494,15 @@ function WechatPublishModal({ content, onClose }) {
       const res = await getWechatAccounts();
       setLoadingAccounts(false);
       if (res.ok) { setAccounts(res.accounts || []); if(res.accounts?.length>0) setSelectedAccount(res.accounts[0].appid); }
-      else setError(res.error || 'è·åå¬ä¼å·å¤±è´¥');
+      else setError(res.error || '获取公众号失败');
     }
     if (IS_HOSTED) fetchAccounts();
-    else { setLoadingAccounts(false); setError('æ¬å°æ¨¡å¼ä¸æ¯æåå¸'); }
+    else { setLoadingAccounts(false); setError('本地模式不支持发布'); }
   }, []);
 
   async function handlePublish() {
-    if (!selectedAccount) { setError('è¯·éæ©å¬ä¼å·'); return; }
-    if (!title.trim()) { setError('è¯·å¡«åæ é¢'); return; }
+    if (!selectedAccount) { setError('请选择公众号'); return; }
+    if (!title.trim()) { setError('请填写标题'); return; }
     setLoading(true); setError('');
     const res = await publishToWechat({
       wechatAppid: selectedAccount, title: title.trim(),
@@ -512,74 +512,74 @@ function WechatPublishModal({ content, onClose }) {
     });
     setLoading(false);
     if (res.ok) setResult(res);
-    else setError(res.error || 'åå¸å¤±è´¥');
+    else setError(res.error || '发布失败');
   }
 
   return (
     <div className="modal-backdrop" onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="modal-box">
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
-          <h3 style={{fontSize:18,fontWeight:700,margin:0}}>ð¤ åå¸å°å¾®ä¿¡å¬ä¼å·</h3>
-          <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',fontSize:20,color:'#94a3b8'}}>â</button>
+          <h3 style={{fontSize:18,fontWeight:700,margin:0}}>📤 发布到微信公众号</h3>
+          <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',fontSize:20,color:'#94a3b8'}}>✕</button>
         </div>
 
         {result ? (
           <div style={{textAlign:'center',padding:'20px 0'}}>
-            <div style={{fontSize:48,marginBottom:12}}>â</div>
-            <h4 style={{fontSize:18,fontWeight:600,marginBottom:8}}>åå¸æåï¼</h4>
-            <p style={{color:'#64748b',fontSize:14}}>{result.message || 'æç« å·²æäº¤åå¸'}|/p>
-            {result.url && <a href={result.url} target="_blank" rel="noreferrer" style={{color:'#6366f1',fontSize:13}}>æ¥çæç«  â</a>}
-            <button className="btn-primary" onClick={onClose} style={{marginTop:20,padding:'8px 24px',borderRadius:8}}>å³é­</button>
+            <div style={{fontSize:48,marginBottom:12}}>✅</div>
+            <h4 style={{fontSize:18,fontWeight:600,marginBottom:8}}>发布成功！</h4>
+            <p style={{color:'#64748b',fontSize:14}}>{result.message || '文章已提交发布'}</p>
+            {result.url && <a href={result.url} target="_blank" rel="noreferrer" style={{color:'#6366f1',fontSize:13}}>查看文章 →</a>}
+            <button className="btn-primary" onClick={onClose} style={{marginTop:20,padding:'8px 24px',borderRadius:8}}>关闭</button>
           </div>
         ) : (
           <>
             {loadingAccounts ? (
               <div style={{textAlign:'center',padding:24}}><span className="spinner" style={{borderColor:'#6366f1',borderTopColor:'transparent'}}/></div>
             ) : accounts.length === 0 && !error ? (
-              <p style={{color:'#64748b',textAlign:'center'}}>ææ ç»å®çå¬ä¼å·</p>
+              <p style={{color:'#64748b',textAlign:'center'}}>暂无绑定的公众号</p>
             ) : (
               <>
                 {accounts.length > 0 && (
                   <div style={{marginBottom:14}}>
-                    <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>éæ©å¬ä¼å·</label>
+                    <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>选择公众号</label>
                     <select className="input-base" value={selectedAccount} onChange={e=>setSelectedAccount(e.target.value)}>
                       {accounts.map(a => <option key={a.appid} value={a.appid}>{a.name || a.appid}</option>)}
                     </select>
                   </div>
                 )}
                 <div style={{marginBottom:14}}>
-                  <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>æç« æ é¢ *</label>
-                  <input className="input-base" value={title} onChange={e=>setTitle(e.target.value)} placeholder="è¯·è¾å¥æç« æ é¢" />
+                  <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>文章标题 *</label>
+                  <input className="input-base" value={title} onChange={e=>setTitle(e.target.value)} placeholder="请输入文章标题" />
                 </div>
                 <div style={{marginBottom:14}}>
-                  <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>æè¦</label>
-                  <textarea className="input-base" value={summary} onChange={e=>setSummary(e.target.value)} rows={2} placeholder="æç« æè¦ï¼å¯éï¼" style={{minHeight:60}}/>
+                  <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>摘要</label>
+                  <textarea className="input-base" value={summary} onChange={e=>setSummary(e.target.value)} rows={2} placeholder="文章摘要（可选）" style={{minHeight:60}}/>
                 </div>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:14}}>
                   <div>
-                    <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>æç« ç±»å</label>
+                    <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>文章类型</label>
                     <select className="input-base" value={articleType} onChange={e=>setArticleType(e.target.value)}>
-                      <option value="news">å¾æï¼newsï¼</option>
-                      <option value="newspic">å¾çæ¶æ¯ï¼newspicï¼</option>
+                      <option value="news">图文（news）</option>
+                      <option value="newspic">图片消息（newspic）</option>
                     </select>
                   </div>
                   <div>
-                    <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>ä½è</label>
-                    <input className="input-base" value={author} onChange={e=>setAuthor(e.target.value)} placeholder="ä½èåï¼å¯éï¼" />
+                    <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>作者</label>
+                    <input className="input-base" value={author} onChange={e=>setAuthor(e.target.value)} placeholder="作者名（可选）" />
                   </div>
                 </div>
                 <div style={{marginBottom:20}}>
-                  <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>å°é¢å¾ URL</label>
-                  <input className="input-base" value={coverImage} onChange={e=>setCoverImage(e.target.value)} placeholder="å°é¢å¾çé¾æ¥ï¼å¯éï¼" />
+                  <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>封面图 URL</label>
+                  <input className="input-base" value={coverImage} onChange={e=>setCoverImage(e.target.value)} placeholder="封面图片链接（可选）" />
                 </div>
               </>
             )}
             {error && <p style={{color:'#ef4444',fontSize:13,marginBottom:12}}>{error}</p>}
             <div style={{display:'flex',gap:10,justifyContent:'flex-end'}}>
-              <button className="btn-secondary" onClick={onClose} style={{padding:'8px 20px',borderRadius:8}}>åæ¶</button>
+              <button className="btn-secondary" onClick={onClose} style={{padding:'8px 20px',borderRadius:8}}>取消</button>
               <button className="btn-primary" onClick={handlePublish} disabled={loading||loadingAccounts||accounts.length===0}
                 style={{padding:'8px 24px',borderRadius:8,fontWeight:600}}>
-                {loading ? <span className="spinner"/> : 'åå¸æç« '}
+                {loading ? <span className="spinner"/> : '发布文章'}
               </button>
             </div>
           </>
@@ -589,9 +589,9 @@ function WechatPublishModal({ content, onClose }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Image Generator Component
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function ImageGenerator({ onImageGenerated }) {
   const [prompt, setPrompt] = useState('');
   const [provider, setProvider] = useState('doubao');
@@ -601,8 +601,8 @@ function ImageGenerator({ onImageGenerated }) {
   const [error, setError] = useState('');
 
   async function handleGenerate() {
-    if (!prompt.trim()) { setError('è¯·è¾å¥å¾åæè¿°'); return; }
-    if (!IS_HOSTED) { setError('æ¬å°æ¨¡å¼ä¸æ¯ææ­¤åè½'); return; }
+    if (!prompt.trim()) { setError('请输入图像描述'); return; }
+    if (!IS_HOSTED) { setError('本地模式不支持此功能'); return; }
     setLoading(true); setError('');
     const [w, h] = size.split('x').map(Number);
     const res = await generateImage({ provider, prompt: prompt.trim(), width: w, height: h, n: 1 });
@@ -610,30 +610,30 @@ function ImageGenerator({ onImageGenerated }) {
     if (res.ok && res.images?.length > 0) {
       setImages(res.images);
       if (onImageGenerated) onImageGenerated(res.images[0].url);
-    } else setError(res.error || 'å¾åçæå¤±è´¥');
+    } else setError(res.error || '图像生成失败');
   }
 
   return (
     <div className="card" style={{padding:20}}>
-      <h4 style={{fontSize:16,fontWeight:700,marginBottom:14}}>ð¨ AI å¾åçæ</h4>
+      <h4 style={{fontSize:16,fontWeight:700,marginBottom:14}}>🎨 AI 图像生成</h4>
       <div style={{display:'flex',gap:8,marginBottom:10}}>
         <select className="input-base" style={{width:130}} value={provider} onChange={e=>setProvider(e.target.value)}>
-          <option value="doubao">è±åAI</option>
-          <option value="jimeng">å³æ¢¦AI</option>
+          <option value="doubao">豆包AI</option>
+          <option value="jimeng">即梦AI</option>
         </select>
         <select className="input-base" style={{width:130}} value={size} onChange={e=>setSize(e.target.value)}>
-          <option value="1024x1024">1:1 æ¹å¾</option>
-          <option value="1280x720">16:9 æ¨ªç</option>
-          <option value="720x1280">9:16 ç«ç</option>
+          <option value="1024x1024">1:1 方图</option>
+          <option value="1280x720">16:9 横版</option>
+          <option value="720x1280">9:16 竖版</option>
           <option value="1024x768">4:3</option>
         </select>
       </div>
       <textarea className="input-base" style={{marginBottom:10,minHeight:72}} value={prompt}
-        onChange={e=>setPrompt(e.target.value)} placeholder="æè¿°ä½ æ³è¦çå¾åï¼ä¾å¦ï¼ä¸ä¸ªç°ä»£ç®çº¦é£æ ¼çåå¬æ¡ï¼ç½è²èæ¯ï¼ä¸ä¸æå½±ï¼4Kæ¸æ°" />
+        onChange={e=>setPrompt(e.target.value)} placeholder="描述你想要的图像，例如：一个现代简约风格的办公桌，白色背景，专业摄影，4K清晰" />
       {error && <p style={{color:'#ef4444',fontSize:13,marginBottom:8}}>{error}</p>}
       <button className="btn-primary" onClick={handleGenerate} disabled={loading}
-        style={{width:'100%'(padding:'9px',borderRadius:8,fontWeight:600}}>
-        {loading ? <><span className="spinner"/> <span style={{marginLeft:8}}>çæä¸­...</span></> : 'â¨ çæå¾å'}
+        style={{width:'100%',padding:'9px',borderRadius:8,fontWeight:600}}>
+        {loading ? <><span className="spinner"/> <span style={{marginLeft:8}}>生成中...</span></> : '✨ 生成图像'}
       </button>
       {images.length > 0 && (
         <div style={{marginTop:14,display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:10}}>
@@ -642,9 +642,9 @@ function ImageGenerator({ onImageGenerated }) {
               <img src={img.url} alt="" style={{width:'100%',display:'block'}} />
               <div style={{position:'absolute',bottom:0,left:0,right:0,background:'linear-gradient(transparent,rgba(0,0,0,.5))',padding:'20px 10px 8px',display:'flex',gap:6}}>
                 <a href={img.url} target="_blank" rel="noreferrer"
-                  style={{background:'rgba(255,255,255,.9)',color:'#1e293b',padding:'3px 10px',borderRadius:6,fontSize:12,textDecoration:'none',fontWeight:600}}>æå¼</a>
+                  style={{background:'rgba(255,255,255,.9)',color:'#1e293b',padding:'3px 10px',borderRadius:6,fontSize:12,textDecoration:'none',fontWeight:600}}>打开</a>
                 <button style={{background:'rgba(255,255,255,.9)',color:'#1e293b',padding:'3px 10px',borderRadius:6,fontSize:12,border:'none',cursor:'pointer',fontWeight:600}}
-                  onClick={()=>navigator.clipboard?.writeText(img.url)}>å¤å¶URL</button>
+                  onClick={()=>navigator.clipboard?.writeText(img.url)}>复制URL</button>
               </div>
             </div>
           ))}
@@ -654,14 +654,14 @@ function ImageGenerator({ onImageGenerated }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
-//  Factory Page (åå®¹å·¥å)
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
+//  Factory Page (内容工厂)
+// ─────────────────────────────────────────────
 function FactoryPage({ auth, usage, onUsed }) {
-  const [keys, setKeys] = useState(loadKeys);
+  const [keys] = useState(loadKeys);
   const [activeTab, setActiveTab] = useState('article');
   const [topic, setTopic] = useState('');
-  const [style, setStyle] = useState('ä¸ä¸');
+  const [style, setStyle] = useState('专业');
   const [platform, setPlatform] = useState('wechat');
   const [length, setLength] = useState('medium');
   const [result, setResult] = useState('');
@@ -670,117 +670,234 @@ function FactoryPage({ auth, usage, onUsed }) {
   const [showPublish, setShowPublish] = useState(false);
   const [coverImage, setCoverImage] = useState('');
 
+  function saveToHistory() {
+    if (!result.trim()) return;
+    const history = loadContentHistory();
+    const item = {
+      id: Date.now(),
+      title: topic.trim() || '未命名内容',
+      content: result,
+      summary: result.slice(0, 120),
+      platform,
+      coverImage,
+      date: new Date().toLocaleString('zh-CN'),
+    };
+    saveContentHistory([item, ...history]);
+    alert('已保存到内容历史');
+  }
+
   async function handleGenerate() {
-    if (!topic.trim()) { setError('è¯·è¾å¥åä½$¸»é¢'); return; }
-    setLoading(true); setError(''); setResult('');
+    if (!topic.trim()) {
+      setError('请输入创作主题');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setResult('');
 
     if (auth.type === 'guest') {
       const check = await checkUsage(getSessionId());
-      if (!check.allowed) { setLoading(false); setError('åè´¹æ¬¡æ°å·²ç¨å®'); return; }
+      if (!check.allowed) {
+        setLoading(false);
+        setError('免费次数已用完');
+        return;
+      }
     }
 
-    const lengthMap = { short: '800å­ä»¥å', medium: '1200-1800å­', long: '2500å­ä»¥ä¸' };
+    const lengthMap = { short: '800字以内', medium: '1200-1800字', long: '2500字以上' };
     const prompts = {
-      article: `è¯·ä»¥ã${style}ãé£æ ¼ï¼ä¸º${platform==='wechat'?'å¾®ä¿¡å¬ä¼å·':'å°çº¢ä¹¦'}åä½ä¸ç¯å³äºã${topic}ãççæ¬¾æç« ã\nè¦æ±ï¼${lengthMap[length]}ï¼ç»ææ¸æ°ï¼å¼å¤´å¸å¼ç¼çï¼éåå¹³å°è°æ§ï¼å å¥æ°æ®ææ¡ä¾å¢å¼ºè¯´æåã\nè¯·ç´æ¥è¾åºæç« åå®¹ï¼åå«æ é¢ã`,
-      title: `è¯·ä¸ºã${topic}ãçæ10ä¸ªéå${platform==='wechat'?'å¾®ä¿¡å¬ä¼å·':'å°çº¢ä¹¦'}ççæ¬¾æ é¢ã\nè¦æ±ï¼æå¸å¼åãè½å¼åå¥½å¥å¿ãå¼å¯¼ç¹å»ï¼å¯ä»¥ä½¿ç¨æ°å­ãæ¬å¿µãåå·®ç­æå·§ã\nè¯·ç´æ¥ååº10ä¸ªæ é¢ï¼æ¯è¡ä¸ä¸ªã`,
-      outline: `è¯·ä¸ºã${topic}ãçæä¸ä¸ªè¯¦ç»çåå®¹å¤§çº²ã\nè¦æ±ï¼åå«å¼è¨ã3-5ä¸ªä¸»è¦ç« èãæ¯ç« 2-3ä¸ªè¦ç¹ãç»è¯­ï¼éå${platform==='wechat'?'å¾®ä¿¡å¬ä¼å·':'å°çº¢ä¹¦'}ï¼é£æ ¼${style}ã`
+      article: `请以【${style}】风格，为${platform === 'wechat' ? '微信公众号' : '小红书'}创作一篇关于【${topic}】的爆款文章。\n要求：${lengthMap[length]}，结构清晰，开头吸引眼球，适合平台调性，加入数据或案例增强说服力。\n请直接输出文章内容，包含标题。`,
+      title: `请为【${topic}】生成10个适合${platform === 'wechat' ? '微信公众号' : '小红书'}的爆款标题。\n要求：有吸引力、能引发好奇心、引导点击，可以使用数字、悬念、反差等技巧。\n请直接列出10个标题，每行一个。`,
+      outline: `请为【${topic}】生成一个详细的内容大纲。\n要求：包含引言、3-5个主要章节、每章2-3个要点、结语，适合${platform === 'wechat' ? '微信公众号' : '小红书'}，风格${style}。`
     };
 
     if (IS_HOSTED) {
-      const aiKeys = keys;
-      const provider = aiKeys.provider || 'deepseek';
+      const provider = keys.provider || 'deepseek';
       const res = await callAI({
-        provider, model: aiKeys[provider+'_model'] || 'deepseek-chat',
-        apiKey: aiKeys[provider+'_key'] || '',
-        system: 'ä½ æ¯ä¸ä¸ªä¸ä¸çåå®¹åä½å©æï¼æé¿åä½éåä¸­å½ç¤¾äº¤åªä½å¹³å°ççæ¬¾åå®¹ã',
+        provider,
+        model: keys[provider + '_model'] || 'deepseek-chat',
+        apiKey: keys[provider + '_key'] || '',
+        system: '你是一个专业的内容创作助手，擅长创作适合中国社交媒体平台的爆款内容。',
         user: prompts[activeTab]
       });
       setLoading(false);
-      if (res.error) setError(res.error);
-      else setResult(res.content || res.text || res.message || JSON.stringify(res));
-    } else {
-      // Local: simulate
-      setTimeout(() => {
-        setLoading(false);
-        setResult(`[æ¬å°æ¨¡å¼ç¤ºä¾]\n\nä¸»é¢ï¼${topic}\n\nè¿æ¯æ¬å°æ¨¡å¼ä¸çç¤ºä¾è¾åºãå¨çº¿çæ¬ä¼ä½¿ç¨AIä¸ºæ¨çæçå®åå®¹ã\n\næ é¢åè¾òiq»"GR íÑ½Á¥÷j¶³c:k"Ãê¸¸¹¤ì(ô°àÀÀ¤ì(ÉÑÕÉ¸ì(ô((¥¡ÕÑ ¹ÑåÁôôôÕÍÐ¤ì½¹UÍ ¤ìÝ¥ÐÉ½ÉUÍ¡ÑMÍÍ¥½¹% ¤°±Í°¹ÉÑ¤ìô(ô((¼¼MÙÑ¼¡¥ÍÑ½Éä(Íå¹Õ¹Ñ¥½¸ÍÙQ½!¥ÍÑ½Éä ¤ì(½¹ÍÐ¥Ñ´ôì(¥è¡|¬Ñ¹¹½Ü ¤°(Ñ¥Ñ±èÑ½Á¥°(½¹Ñ¹ÐèÉÍÕ±Ð°(Á±Ñ½É´°(ÍÑÑÕÌèÉÐ°(½ÙÉ%µ°(ÉÑ}Ðè¹ÜÑ ¤¹Ñ½%M=MÑÉ¥¹ ¤(ôì(½¹ÍÐ¡¥ÍÑ½Éäô±½
-½¹Ñ¹Ñ!¥ÍÑ½Éä ¤ì(ÍÙ
-½¹Ñ¹Ñ!¥ÍÑ½Éä¡m¥Ñ´°¸¸¹¡¥ÍÑ½Éåt¹Í±¥ À°ÄÀÀ¤¤ì(±ÉÐ ÞËþw¶c"Ãºç:>È¤ì(ô((ÉÑÕÉ¸ (ñ¥ØÍÑå±õííÁ¥¹èÈÐ±µá]¥Ñ èäØÀ±µÉ¥¸èÀÕÑ¼õôø(ñ¥ØÍÑå±õííµÉ¥¹	½ÑÑ½´èÈÁõôø(ñ ÈÍÑå±õíí½¹ÑM¥éèÈÈ±½¹Ñ]¥¡ÐèÜÀÀ±µÉ¥¹	½ÑÑ½´èÑõôûÂ~>´ºçÞ:ð½ Èø(ñÀÍÑå±õíí½±½ÈèØÐÜÐá±½¹ÑM¥éèÄÑõôù'¦¦Ç*£jºç"oösâ·þ¾ò3â¦R»R"C"²ûºäð½Àø(ð½¥Øø((ì¼¨QÌ¨½ô(ñ¥ØÍÑå±õíí¥ÍÁ±äè±à±ÀèÐ±µÉ¥¹	½ÑÑ½´èÄØ±­É½Õ¹èÅÕä±½ÉÉI¥ÕÌèÄÀ±Á¥¹èÐ±Ý¥Ñ è¥Ðµ½¹Ñ¹Ðõôø(ímí¥èÉÑ¥±±±°èr7¾â<Z®"oöpô±í¥èÑ¥Ñ±±±°èÂ~N0¦cR"@ô±í¥è½ÕÑ±¥¹±±°èÂ~N,êË¶["Hõt¹µÀ¡Ðôø (ñ¥Ø­äõíÐ¹¥ô½¹
-±¥¬õì ¤ôùÍÑÑ¥ÙQ¡Ð¹¥¥ô(ÍÑå±õííÁ¥¹èÙÁàÄÙÁà±½ÉÉI¥ÕÌèÜ±ÕÉÍ½ÈèÁ½¥¹ÑÈ±½¹ÑM¥éèÄÌ±½¹Ñ]¥¡ÐèÔÀÀ°(­É½Õ¹éÑ¥ÙQôôõÐ¹¥üèÑÉ¹ÍÁÉ¹Ð±½±½ÈéÑ¥ÙQôôõÐ¹¥üØÌØÙÄèØÐÜÐá°(½áM¡½ÜéÑ¥ÙQôôõÐ¹¥üÀÅÁàÍÁàÉ À°À°À°¸Ä¤è¹½¹±ÑÉ¹Í¥Ñ¥½¸è±°¸ÄÕÌõôø(íÐ¹±±ô(ð½¥Øø(¤¥ô(ð½¥Øø((ñ¥ØÍÑå±õíí¥ÍÁ±äèÉ¥±É¥QµÁ±Ñ
-½±Õµ¹ÌèÅÈÅÈ±ÀèÈÁõôø(ì¼¨1Ðè
-½¹¥¨½ô(ñ¥Øø(ñ¥Ø±ÍÍ9µôÉÍÑå±õííÁ¥¹èÈÀ±µÉ¥¹	½ÑÑ½´èÄÙõôø(ñ ÐÍÑå±õíí½¹ÑM¥éèÄÔ±½¹Ñ]¥¡ÐèØÀÀ±µÉ¥¹	½ÑÑ½´èÄÑõôû"oös¦7ö¸ð½ Ðø(ñ¥ØÍÑå±õííµÉ¥¹	½ÑÑ½´èÄÉõôø(ñ±°ÍÑå±õíí½¹ÑM¥éèÄÌ±½±½ÈèÐÜÔÔØä±¥ÍÁ±äè±½¬±µÉ¥¹	½ÑÑ½´èÕõôû"oösâï¦`¨ð½±°ø(ñ¥¹ÁÕÐ±ÍÍ9µô¥¹ÁÕÐµÍÙ±ÕõíÑ½Á¥ô½¹
-¡¹õíôùÍÑQ½Á¥¡¹ÑÉÐ¹Ù±Õ¥ôÁ±¡½±Èôú/¾òk¢3rë¦®cV#Þ" value={topic} onChange={e=>setTopic(e.target.value)} placeholder="ä¾å¦ï¼èåºé«æå·¥ä½æ¹æ³ãå¥èº«åèé£è°±..." />
+      if (res.error) {
+        setError(res.error);
+      } else {
+        setResult(res.content || res.text || res.message || JSON.stringify(res));
+        if (auth.type === 'guest') {
+          onUsed();
+          await recordUsage(getSessionId(), false, 'factory');
+        }
+      }
+      return;
+    }
+
+    setTimeout(() => {
+      setLoading(false);
+      const samples = {
+        article: `【${topic}】\n\n这是本地模式下生成的示例长文。\n\n1. 开场用一个强冲突观点吸引读者\n2. 中段给出可执行的方法和案例\n3. 结尾加一句行动号召，方便发布到${platform === 'wechat' ? '微信公众号' : '小红书'}`,
+        title: `1. ${topic}，为什么现在越来越多人开始重视？\n2. 做好${topic}，其实只要这3步\n3. 我试了7天${topic}，结果完全超出预期\n4. 关于${topic}，99%的人都忽略了这一点\n5. ${topic}这件事，越早知道越好`,
+        outline: `一、引言：为什么${topic}值得现在做\n二、现状分析：大多数人卡在哪里\n三、方法拆解：3个可复制步骤\n四、案例说明：真实场景怎么落地\n五、总结：立刻开始的最小行动`
+      };
+      setResult(samples[activeTab]);
+    }, 600);
+  }
+
+  return (
+    <div style={{padding:24,maxWidth:1320,margin:'0 auto'}}>
+      <div style={{marginBottom:20}}>
+        <h2 style={{fontSize:24,fontWeight:700,marginBottom:6}}>🏭 内容工厂</h2>
+        <p style={{color:'#64748b',fontSize:14}}>输入主题，生成标题、大纲或完整内容，并可继续发布到微信公众号。</p>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1.1fr .9fr',gap:20}}>
+        <div style={{display:'flex',flexDirection:'column',gap:16}}>
+          <div className="card" style={{padding:20}}>
+            <div style={{display:'flex',gap:6,marginBottom:14}}>
+              {[
+                { id: 'article', label: '文章' },
+                { id: 'title', label: '标题' },
+                { id: 'outline', label: '大纲' },
+              ].map(tab => (
+                <div
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    background: activeTab === tab.id ? '#6366f1' : '#eef2ff',
+                    color: activeTab === tab.id ? '#fff' : '#4f46e5'
+                  }}
+                >
+                  {tab.label}
+                </div>
+              ))}
             </div>
+
+            <div style={{marginBottom:12}}>
+              <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>创作主题</label>
+              <input
+                className="input-base"
+                value={topic}
+                onChange={e => setTopic(e.target.value)}
+                placeholder="例如：职场高效工作方法、健身减脂食谱..."
+              />
+            </div>
+
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}>
               <div>
-                <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>ç®æ å¹³å°</label>
-                <select className="input-base" value={platform} onChange={e=>setPlatform(e.target.value)}>
-                  <option value="wechat">å¾®ä¿¡å¬ä¼å·</option>
-                  <option value="xhs">å°çº¢ä¹¦</option>
-                  <option value="douyin">æé³/è§é¢å·</option>
+                <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>目标平台</label>
+                <select className="input-base" value={platform} onChange={e => setPlatform(e.target.value)}>
+                  <option value="wechat">微信公众号</option>
+                  <option value="xhs">小红书</option>
+                  <option value="douyin">抖音/视频号</option>
                 </select>
               </div>
               <div>
-                <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>åä½é£æ ¼</label>
-                <select className="input-base" value={style} onChange={e=>setStyle(e.target.value)}>
-                  <option value="ä¸ä¸">ä¸ä¸æå¨</option>
-                  <option value="è½»æ¾">è½»æ¾å¹½é»</option>
-                  <option value="ææ§">ææå±é¸£</option>
-                  <option value="å¹²è´§">å¹²è´§å®ç¨</option>
-                  <option value="æäº">æäºåäº</option>
+                <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>写作风格</label>
+                <select className="input-base" value={style} onChange={e => setStyle(e.target.value)}>
+                  <option value="专业">专业权威</option>
+                  <option value="轻松">轻松幽默</option>
+                  <option value="感性">情感共鸣</option>
+                  <option value="干货">干货实用</option>
+                  <option value="故事">故事叙事</option>
                 </select>
               </div>
             </div>
+
             {activeTab === 'article' && (
               <div style={{marginBottom:12}}>
-                <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>åå®¹é¿åº¦</label>
+                <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>内容长度</label>
                 <div style={{display:'flex',gap:8}}>
-                  {[{v:'short',l:'ç­æ'},{v:'medium',l:'æ å'},{v:'long',l:'é¿æ'}].map(({v,l})=>(
-                    <div key={v} onClick={()=>setLength(v)}
-                      style={{flex:1,textAlign:'center',padding:'6px',borderRadius:7,cursor:'pointer',fontSize:13,border:'1.5px solid',
-                        borderColor:length===v?'#6366f1':'#e2e8f0',
-                        background:length===v?'#eef2ff':'#fff',color:length===v?'#6366f1':'#64748b'}}>
+                  {[{v:'short',l:'短文'},{v:'medium',l:'标准'},{v:'long',l:'长文'}].map(({v,l}) => (
+                    <div
+                      key={v}
+                      onClick={() => setLength(v)}
+                      style={{
+                        flex: 1,
+                        textAlign: 'center',
+                        padding: '6px',
+                        borderRadius: 7,
+                        cursor: 'pointer',
+                        fontSize: 13,
+                        border: '1.5px solid',
+                        borderColor: length === v ? '#6366f1' : '#e2e8f0',
+                        background: length === v ? '#eef2ff' : '#fff',
+                        color: length === v ? '#6366f1' : '#64748b'
+                      }}
+                    >
                       {l}
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
             {error && <p style={{color:'#ef4444',fontSize:13,marginBottom:8}}>{error}</p>}
-            <button className="btn-primary" onClick={handleGenerate} disabled={loading}
-              style={{width:'100%',padding:'10px',borderRadius:8,fontSize:15,fontWeight:600}}>
-              {loading ? <><span className="spinner"/> <span style={{marginLeft:8}}>AIåä½ä¸­...</span></> : 'ð å¼å§åä½'}
+
+            <button
+              className="btn-primary"
+              onClick={handleGenerate}
+              disabled={loading}
+              style={{width:'100%',padding:'10px',borderRadius:8,fontSize:15,fontWeight:600}}
+            >
+              {loading ? <><span className="spinner"/> <span style={{marginLeft:8}}>AI创作中...</span></> : '🚀 开始创作'}
             </button>
           </div>
 
-          <ImageGenerator onImageGenerated={url=>setCoverImage(url)} />
+          <ImageGenerator onImageGenerated={url => setCoverImage(url)} />
         </div>
 
-        {/* Right: Result */}
         <div>
           <div className="card" style={{padding:20,minHeight:300}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-              <h4 style={{fontSize:15,fontWeight:600,margin:0}}>åä½ç»æ</h4>
+              <h4 style={{fontSize:15,fontWeight:600,margin:0}}>创作结果</h4>
               {result && (
                 <div style={{display:'flex',gap:6}}>
-                  <button className="btn-secondary" style={{padding:'4px 12px',borderRadius:6,fontSize:13}}
-                    onClick={()=>navigator.clipboard?.writeText(result)}>å¤å¶</button>
-                  <button className="btn-secondary" style={{padding:'4px 12px',borderRadius:6,fontSize:13}}
-                    onClick={saveToHistory}>ä¿å­</button>
+                  <button
+                    className="btn-secondary"
+                    style={{padding:'4px 12px',borderRadius:6,fontSize:13}}
+                    onClick={() => navigator.clipboard?.writeText(result)}
+                  >
+                    复制
+                  </button>
+                  <button
+                    className="btn-secondary"
+                    style={{padding:'4px 12px',borderRadius:6,fontSize:13}}
+                    onClick={saveToHistory}
+                  >
+                    保存
+                  </button>
                   {platform === 'wechat' && (
-                    <button className="btn-primary" style={{padding:'4px 12px',borderRadius:6,fontSize:13}}
-                      onClick={()=>setShowPublish(true)}>åå¸</button>
+                    <button
+                      className="btn-primary"
+                      style={{padding:'4px 12px',borderRadius:6,fontSize:13}}
+                      onClick={() => setShowPublish(true)}
+                    >
+                      发布
+                    </button>
                   )}
                 </div>
               )}
             </div>
+
             {result ? (
-              <textarea className="input-base" value={result} onChange={e=>setResult(e.target.value)}
-                style={{width:'100%',minHeight:400,resize:'vertical',fontSize:14,lineHeight:1.7,fontFamily:'inherit'}} />
+              <textarea
+                className="input-base"
+                value={result}
+                onChange={e => setResult(e.target.value)}
+                style={{width:'100%',minHeight:400,resize:'vertical',fontSize:14,lineHeight:1.7,fontFamily:'inherit'}}
+              />
             ) : (
               <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:250,color:'#94a3b8'}}>
-                <div style={{fontSize:52,marginBottom:16}}>âï¸</div>
-                <p style={{fontSize:15}}>å¡«åå·¦ä¾§éç½®ï¼ç¹å»ãå¼å§åä½ã</p>
-                <p style={{fontSize:13,marginTop:4}}>AIå°ä¸ºä½ çæä¸ä¸åå®¹</p>
+                <div style={{fontSize:52,marginBottom:16}}>✍️</div>
+                <p style={{fontSize:15}}>填写左侧配置，点击「开始创作」</p>
+                <p style={{fontSize:13,marginTop:4}}>AI将为你生成专业内容</p>
               </div>
             )}
           </div>
@@ -788,16 +905,18 @@ function FactoryPage({ auth, usage, onUsed }) {
       </div>
 
       {showPublish && (
-        <WechatPublishModal content={{ title: topic, html: result, coverImage }}
-          onClose={()=>setShowPublish(false)} />
+        <WechatPublishModal
+          content={{ title: topic, html: result, coverImage }}
+          onClose={() => setShowPublish(false)}
+        />
       )}
     </div>
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Publish Page
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function PublishPage({ auth }) {
   const [history, setHistory] = useState(loadContentHistory);
   const [showPublish, setShowPublish] = useState(false);
@@ -807,7 +926,7 @@ function PublishPage({ auth }) {
   function refreshHistory() { setHistory(loadContentHistory()); }
 
   function handleDelete(id) {
-    if (!confirm('ç¡®è®¤å é¤ï¼')) return;
+    if (!confirm('确认删除？')) return;
     const updated = history.filter(h => h.id !== id);
     saveContentHistory(updated);
     setHistory(updated);
@@ -816,12 +935,12 @@ function PublishPage({ auth }) {
   return (
     <div style={{padding:24,maxWidth:1000,margin:'0 auto'}}>
       <div style={{marginBottom:20}}>
-        <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>ð¤ åå¸ç®¡ç</h2>
-        <p style={{color:'#64748b',fontSize:14}}>ç®¡çåå®¹åå¸å°åå¹³å°</p>
+        <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>📤 发布管理</h2>
+        <p style={{color:'#64748b',fontSize:14}}>管理内容发布到各平台</p>
       </div>
 
       <div style={{display:'flex',gap:4,marginBottom:20,background:'#f1f5f9',borderRadius:10,padding:4,width:'fit-content'}}>
-        {[{id:'history',label:'ð åå®¹åå²'},{id:'wechat',label:'ð° å¾®ä¿¡åå¸'}].map(t=>(
+        {[{id:'history',label:'📁 内容历史'},{id:'wechat',label:'📰 微信发布'}].map(t=>(
           <div key={t.id} onClick={()=>setActiveTab(t.id)}
             style={{padding:'6px 16px',borderRadius:7,cursor:'pointer',fontSize:13,fontWeight:500,
               background:activeTab===t.id?'#fff':'transparent',color:activeTab===t.id?'#6366f1':'#64748b',
@@ -835,9 +954,9 @@ function PublishPage({ auth }) {
         <div>
           {history.length === 0 ? (
             <div className="card" style={{padding:48,textAlign:'center'}}>
-              <div style={{fontSize:56,marginBottom:16}}>ð</div>
-              <p style={{color:'#64748b',fontSize:16}}>ææ åå®¹è®°å½</p>
-              <p style={{color:'#94a3b8',fontSize:13,marginTop:8}}>å¨åå®¹å·¥ååä½å¹¶ä¿å­åå®¹åï¼å°å¨æ­¤æ¾ç¤º</p>
+              <div style={{fontSize:56,marginBottom:16}}>📁</div>
+              <p style={{color:'#64748b',fontSize:16}}>暂无内容记录</p>
+              <p style={{color:'#94a3b8',fontSize:13,marginTop:8}}>在内容工厂创作并保存内容后，将在此显示</p>
             </div>
           ) : history.map(item => (
             <div key={item.id} className="card" style={{padding:16,marginBottom:12}}>
@@ -846,20 +965,20 @@ function PublishPage({ auth }) {
                   <div style={{fontWeight:600,fontSize:15,marginBottom:6,color:'#1e293b'}}>{item.title}</div>
                   <p style={{color:'#64748b',fontSize:13,margin:'0 0 8px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.content?.slice(0,100)}...</p>
                   <div style={{display:'flex',gap:12,fontSize:12,color:'#94a3b8'}}>
-                    <span>ð {new Date(item.created_at).toLocaleString('zh-CN')}</span>
-                    <span className="tag" style={{background:'#f1f5f9',color:'#64748b',padding:'1px 8px'}}>{item.platform||'æªç¥å¹³å°'}</span>
+                    <span>📅 {new Date(item.created_at).toLocaleString('zh-CN')}</span>
+                    <span className="tag" style={{background:'#f1f5f9',color:'#64748b',padding:'1px 8px'}}>{item.platform||'未知平台'}</span>
                     <span className="tag" style={{background:item.status==='published'?'#dcfce7':'#fef3c7',color:item.status==='published'?'#16a34a':'#d97706',padding:'1px 8px'}}>
-                      {item.status==='published'?'å·²åå¸':'èç¨¿'}
+                      {item.status==='published'?'已发布':'草稿'}
                     </span>
                   </div>
                 </div>
                 <div style={{display:'flex',gap:6,marginLeft:12,flexShrink:0}}>
                   {item.platform === 'wechat' && (
                     <button className="btn-primary" style={{padding:'5px 12px',borderRadius:6,fontSize:13}}
-                      onClick={()=>{setSelectedContent(item);setShowPublish(true);}}>åå¸å°å¾®ä¿¡</button>
+                      onClick={()=>{setSelectedContent(item);setShowPublish(true);}}>发布到微信</button>
                   )}
                   <button className="btn-secondary" style={{padding:'5px 12px',borderRadius:6,fontSize:13}}
-                    onClick={()=>handleDelete(item.id)}>å é¤</button>
+                    onClick={()=>handleDelete(item.id)}>删除</button>
                 </div>
               </div>
             </div>
@@ -869,12 +988,12 @@ function PublishPage({ auth }) {
 
       {activeTab === 'wechat' && (
         <div className="card" style={{padding:32,textAlign:'center'}}>
-          <div style={{fontSize:48,marginBottom:16}}>ð°</div>
-          <h3 style={{fontSize:18,fontWeight:700,marginBottom:8}}>åå¸æ°æç« å°å¾®ä¿¡å¬ä¼å·</h3>
-          <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>ä»åå®¹åå²ä¸­éæ©æç« ï¼æç´æ¥åå¸æ°åå®¹</p>
+          <div style={{fontSize:48,marginBottom:16}}>📰</div>
+          <h3 style={{fontSize:18,fontWeight:700,marginBottom:8}}>发布新文章到微信公众号</h3>
+          <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>从内容历史中选择文章，或直接发布新内容</p>
           <button className="btn-primary" style={{padding:'10px 28px',borderRadius:8,fontSize:15,fontWeight:600}}
             onClick={()=>{setSelectedContent({title:'',text:'',html:''});setShowPublish(true);}}>
-            + åå¸æ°æç« 
+            + 发布新文章
           </button>
         </div>
       )}
@@ -886,9 +1005,9 @@ function PublishPage({ auth }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Analytics Page
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function AnalyticsPage() {
   const history = loadContentHistory();
   const total = history.length;
@@ -900,11 +1019,11 @@ function AnalyticsPage() {
   return (
     <div style={{padding:24,maxWidth:960,margin:'0 auto'}}>
       <div style={{marginBottom:20}}>
-        <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>ð æ°æ®åæ</h2>
-        <p style={{color:'#64748b',fontSize:14}}>äºè§£ä½ çåå®¹åä½æ°æ®</p>
+        <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>📊 数据分析</h2>
+        <p style={{color:'#64748b',fontSize:14}}>了解你的内容创作数据</p>
       </div>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:16,marginBottom:24}}>
-        {[{label:'åå®¹æ»é',value:total,icon:'ð',color:'#6366f1'},{label:'å·²åå¸',value:published,icon:'â',color:'#10b981'},{label:'èç¨¿',value:drafts,icon:'ð',color:'#f59e0b'},{label:'å¹³å°æ°',value:Object.keys(platforms).length,icon:'ð',color:'#8b5cf6'}].map(s=>(
+        {[{label:'内容总量',value:total,icon:'📝',color:'#6366f1'},{label:'已发布',value:published,icon:'✅',color:'#10b981'},{label:'草稿',value:drafts,icon:'📋',color:'#f59e0b'},{label:'平台数',value:Object.keys(platforms).length,icon:'🌐',color:'#8b5cf6'}].map(s=>(
           <div key={s.label} className="card" style={{padding:20,textAlign:'center'}}>
             <div style={{fontSize:32,marginBottom:8}}>{s.icon}</div>
             <div style={{fontSize:28,fontWeight:700,color:s.color}}>{s.value}</div>
@@ -914,7 +1033,7 @@ function AnalyticsPage() {
       </div>
       {Object.keys(platforms).length > 0 && (
         <div className="card" style={{padding:20}}>
-          <h4 style={{fontSize:15,fontWeight:600,marginBottom:14}}>å¹³å°åå¸</h4>
+          <h4 style={{fontSize:15,fontWeight:600,marginBottom:14}}>平台分布</h4>
           {Object.entries(platforms).map(([p,c])=>(
             <div key={p} style={{marginBottom:10}}>
               <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
@@ -929,17 +1048,17 @@ function AnalyticsPage() {
       )}
       {total === 0 && (
         <div className="card" style={{padding:48,textAlign:'center'}}>
-          <div style={{fontSize:56,marginBottom:16}}>ð</div>
-          <p style={{color:'#64748b'}}>ææ æ°æ®ï¼åå»åå®¹å·¥ååä½åå®¹å§</p>
+          <div style={{fontSize:56,marginBottom:16}}>📊</div>
+          <p style={{color:'#64748b'}}>暂无数据，先去内容工厂创作内容吧</p>
         </div>
       )}
     </div>
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  IP Page
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function IPPage() {
   const [persona, setPersona] = useState({name:'',niche:'',style:'',audience:'',unique:''});
   const [saved, setSaved] = useState(()=>{ try{return JSON.parse(localStorage.getItem('cf_ip')||'null')}catch{return null} });
@@ -947,46 +1066,46 @@ function IPPage() {
     if (!persona.name) return;
     localStorage.setItem('cf_ip', JSON.stringify(persona));
     setSaved({...persona});
-    alert('IPå®ä½å·²ä¿å­');
+    alert('IP定位已保存');
   }
   const p = saved || persona;
   return (
     <div style={{padding:24,maxWidth:900,margin:'0 auto'}}>
-      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>â¨ IPæé </h2>
-      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>å®ä¹ä½ çä¸ªäººåçå®ä½</p>
+      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>✨ IP打造</h2>
+      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>定义你的个人品牌定位</p>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
         <div className="card" style={{padding:20}}>
-          <h4 style={{fontSize:15,fontWeight:600,marginBottom:14}}>IPå®ä½è®¾ç½®</h4>
-          {[{key:'name',label:'IPåç§°',ph:'ä½ çåçå'},{key:'niche',label:'åç´é¢å',ph:'èåº/å¥åº·/çè´¢...'},{key:'style',label:'åå®¹é£æ ¼',ph:'ä¸ä¸/è½»æ¾/ææ...'},{key:'audience',label:'ç®æ åä¼',ph:'25-35å²èåºç½é¢...'},{key:'unique',label:'å·®å¼åä¼å¿',ph:'ä½ çç¬ç¹ä»·å¼ç¹'}].map(f=>(
+          <h4 style={{fontSize:15,fontWeight:600,marginBottom:14}}>IP定位设置</h4>
+          {[{key:'name',label:'IP名称',ph:'你的品牌名'},{key:'niche',label:'垂直领域',ph:'职场/健康/理财...'},{key:'style',label:'内容风格',ph:'专业/轻松/情感...'},{key:'audience',label:'目标受众',ph:'25-35岁职场白领...'},{key:'unique',label:'差异化优势',ph:'你的独特价值点'}].map(f=>(
             <div key={f.key} style={{marginBottom:12}}>
               <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>{f.label}</label>
               <input className="input-base" value={persona[f.key]} onChange={e=>setPersona({...persona,[f.key]:e.target.value})} placeholder={f.ph} />
             </div>
           ))}
-          <button className="btn-primary" onClick={save} style={{width:'100%',padding:'9px',borderRadius:8,fontWeight:600}}>ä¿å­IPå®ä½</button>
+          <button className="btn-primary" onClick={save} style={{width:'100%',padding:'9px',borderRadius:8,fontWeight:600}}>保存IP定位</button>
         </div>
         <div className="card" style={{padding:20}}>
-          <h4 style={{fontSize:15,fontWeight:600,marginBottom:14}}>IPæ¡£æ¡é¢è§</h4>
+          <h4 style={{fontSize:15,fontWeight:600,marginBottom:14}}>IP档案预览</h4>
           {['name','niche','style','audience','unique'].map(k=>p[k]&&(
             <div key={k} style={{marginBottom:12,padding:12,background:'#f8fafc',borderRadius:8}}>
-              <div style={{fontSize:12,color:'#94a3b8',marginBottom:4}}>{{name:'IPåç§°',niche:'åç´é¢å',style:'åå®¹é£æ ¼',audience:'ç®æ åä¼',unique:'å·®å¼åä¼å¿'}[k]}</div>
+              <div style={{fontSize:12,color:'#94a3b8',marginBottom:4}}>{{name:'IP名称',niche:'垂直领域',style:'内容风格',audience:'目标受众',unique:'差异化优势'}[k]}</div>
               <div style={{fontSize:14,fontWeight:500,color:'#1e293b'}}>{p[k]}</div>
             </div>
           ))}
-          {!p.name && <div style={{textAlign:'center',color:'#94a3b8',padding:32}}>å¡«åå·¦ä¾§è¡¨åå»ºç«IPæ¡£æ¡</div>}
+          {!p.name && <div style={{textAlign:'center',color:'#94a3b8',padding:32}}>填写左侧表单建立IP档案</div>}
         </div>
       </div>
     </div>
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Account Page
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function AccountPage() {
   const [accounts, setAccounts] = useState(()=>{ try{return JSON.parse(localStorage.getItem('cf_accounts')||'[]')}catch{return []} });
   const [form, setForm] = useState({platform:'wechat',name:'',id:'',note:''});
-  const PLATFORMS = [{v:'wechat',l:'å¾®ä¿¡å¬ä¼å·'},{v:'xhs',l:'å°çº¢ä¹¦'},{v:'douyin',l:'æé³'},{v:'video',l:'è§é¢å·'},{v:'wb',l:'å¾®å'}];
+  const PLATFORMS = [{v:'wechat',l:'微信公众号'},{v:'xhs',l:'小红书'},{v:'douyin',l:'抖音'},{v:'video',l:'视频号'},{v:'wb',l:'微博'}];
   function add() {
     if (!form.name) return;
     const updated = [...accounts,{...form,id_:Date.now()}];
@@ -1001,36 +1120,36 @@ function AccountPage() {
   }
   return (
     <div style={{padding:24,maxWidth:900,margin:'0 auto'}}>
-      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>ð¤ è´¦å·ç®¡ç</h2>
-      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>ç®¡çä½ çç¤¾äº¤åªä½è´¦å·ç©éµ</p>
+      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>👤 账号管理</h2>
+      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>管理你的社交媒体账号矩阵</p>
       <div style={{display:'grid',gridTemplateColumns:'340px 1fr',gap:20}}>
         <div className="card" style={{padding:20}}>
-          <h4 style={{fontSize:15,fontWeight:600,marginBottom:14}}>æ·»å è´¦å·</h4>
+          <h4 style={{fontSize:15,fontWeight:600,marginBottom:14}}>添加账号</h4>
           <div style={{marginBottom:10}}>
-            <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>å¹³å°</label>
+            <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>平台</label>
             <select className="input-base" value={form.platform} onChange={e=>setForm({...form,platform:e.target.value})}>
               {PLATFORMS.map(p=><option key={p.v} value={p.v}>{p.l}</option>)}
             </select>
           </div>
           <div style={{marginBottom:10}}>
-            <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>è´¦å·åç§° *</label>
-            <input className="input-base" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="è´¦å·æµç§°" />
+            <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>账号名称 *</label>
+            <input className="input-base" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="账号昵称" />
           </div>
           <div style={{marginBottom:10}}>
-            <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>è´¦å·ID</label>
-            <input className="input-base" value={form.id} onChange={e=>setForm({...form,id:e.target.value})} placeholder="å¹³å°è´¦å·IDï¼å¯éï¼" />
+            <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>账号ID</label>
+            <input className="input-base" value={form.id} onChange={e=>setForm({...form,id:e.target.value})} placeholder="平台账号ID（可选）" />
           </div>
           <div style={{marginBottom:14}}>
-            <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>å¤æ³¨</label>
-            <input className="input-base" value={form.note} onChange={e=>setForm({...form,note:e.target.value})} placeholder="å¤æ³¨ä¿¡æ¯" />
+            <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>备注</label>
+            <input className="input-base" value={form.note} onChange={e=>setForm({...form,note:e.target.value})} placeholder="备注信息" />
           </div>
-          <button className="btn-primary" onClick={add} style={{width:'100%',padding:'9px',borderRadius:8,fontWeight:600}}>+ æ·»å è´¦å·</button>
+          <button className="btn-primary" onClick={add} style={{width:'100%',padding:'9px',borderRadius:8,fontWeight:600}}>+ 添加账号</button>
         </div>
         <div>
           {accounts.length === 0 ? (
             <div className="card" style={{padding:48,textAlign:'center'}}>
-              <div style={{fontSize:48,marginBottom:12}}>ð¤</div>
-              <p style={{color:'#64748b'}}>ææ è´¦å·ï¼æ·»å ä½ çç¤¾åªè´¦å·</p>
+              <div style={{fontSize:48,marginBottom:12}}>👤</div>
+              <p style={{color:'#64748b'}}>暂无账号，添加你的社媒账号</p>
             </div>
           ) : accounts.map(a=>(
             <div key={a.id_} className="card" style={{padding:14,marginBottom:10,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
@@ -1040,7 +1159,7 @@ function AccountPage() {
                 {a.id && <span style={{color:'#64748b',fontSize:13,marginLeft:8}}>@{a.id}</span>}
                 {a.note && <span style={{color:'#94a3b8',fontSize:12,marginLeft:8}}>{a.note}</span>}
               </div>
-              <button onClick={()=>del(a.id_)} style={{background:'#fef2f2',color:'#ef4444',border:'none',padding:'4px 10px',borderRadius:6,cursor:'pointer',fontSize:12}}>å é¤</button>
+              <button onClick={()=>del(a.id_)} style={{background:'#fef2f2',color:'#ef4444',border:'none',padding:'4px 10px',borderRadius:6,cursor:'pointer',fontSize:12}}>删除</button>
             </div>
           ))}
         </div>
@@ -1049,9 +1168,9 @@ function AccountPage() {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
-//  Topics Page (éé¢åº)
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
+//  Topics Page (选题库)
+// ─────────────────────────────────────────────
 function TopicsPage() {
   const [topics, setTopics] = useState(()=>{ try{return JSON.parse(localStorage.getItem('cf_topics')||'[]')}catch{return []} });
   const [input, setInput] = useState('');
@@ -1072,20 +1191,20 @@ function TopicsPage() {
   }
   return (
     <div style={{padding:24,maxWidth:900,margin:'0 auto'}}>
-      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>ð¡ éé¢åº</h2>
-      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>æ¶éåç®¡çåå®¹åä½éé¢</p>
+      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>💡 选题库</h2>
+      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>收集和管理内容创作选题</p>
       <div className="card" style={{padding:20,marginBottom:20}}>
         <div style={{display:'flex',gap:8}}>
-          <input className="input-base" style={{flex:2}} value={input} onChange={e=>setInput(e.target.value)} placeholder="è¾å¥éé¢æ³æ³..." onKeyDown={e=>e.key==='Enter'&&add()} />
-          <input className="input-base" style={{flex:1}} value={tag} onChange={e=>setTag(e.target.value)} placeholder="æ ç­¾ï¼å¯éï¼" />
-          <button className="btn-primary" onClick={add} style={{padding:'8px 20px',borderRadius:8,fontWeight:600,whiteSpace:'nowrap'}}>+ æ·»å </button>
+          <input className="input-base" style={{flex:2}} value={input} onChange={e=>setInput(e.target.value)} placeholder="输入选题想法..." onKeyDown={e=>e.key==='Enter'&&add()} />
+          <input className="input-base" style={{flex:1}} value={tag} onChange={e=>setTag(e.target.value)} placeholder="标签（可选）" />
+          <button className="btn-primary" onClick={add} style={{padding:'8px 20px',borderRadius:8,fontWeight:600,whiteSpace:'nowrap'}}>+ 添加</button>
         </div>
       </div>
       <div>
         {topics.length === 0 ? (
           <div className="card" style={{padding:48,textAlign:'center'}}>
-            <div style={{fontSize:48,marginBottom:12}}>ð¡</div>
-            <p style={{color:'#64748b'}}>éé¢åºä¸ºç©ºï¼å¼å§æ·»å ä½ çåä½çµæ</p>
+            <div style={{fontSize:48,marginBottom:12}}>💡</div>
+            <p style={{color:'#64748b'}}>选题库为空，开始添加你的创作灵感</p>
           </div>
         ) : topics.map(t=>(
           <div key={t.id} className="card" style={{padding:14,marginBottom:8,display:'flex',alignItems:'center',gap:12,opacity:t.used?.6:1}}>
@@ -1095,7 +1214,7 @@ function TopicsPage() {
               {t.tag && <span className="tag" style={{background:'#f1f5f9',color:'#6366f1',marginLeft:8}}>{t.tag}</span>}
               <span style={{fontSize:12,color:'#94a3b8',marginLeft:8}}>{t.date}</span>
             </div>
-            <button onClick={()=>del(t.id)} style={{background:'none',border:'none',color:'#94a3b8',cursor:'pointer',fontSize:16}}>â</button>
+            <button onClick={()=>del(t.id)} style={{background:'none',border:'none',color:'#94a3b8',cursor:'pointer',fontSize:16}}>✕</button>
           </div>
         ))}
       </div>
@@ -1103,9 +1222,9 @@ function TopicsPage() {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Optimize Page
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function OptimizePage({ auth, onUsed }) {
   const [original, setOriginal] = useState('');
   const [result, setResult] = useState('');
@@ -1114,24 +1233,24 @@ function OptimizePage({ auth, onUsed }) {
   const [error, setError] = useState('');
 
   async function handleOptimize() {
-    if (!original.trim()) { setError('è¯·è¾å¥éè¦ä¼åçåå®¹'); return; }
-    if (!IS_HOSTED) { setError('æ¬å°æ¨¡å¼ä¸æ¯ææ­¤åè½'); return; }
+    if (!original.trim()) { setError('请输入需要优化的内容'); return; }
+    if (!IS_HOSTED) { setError('本地模式不支持此功能'); return; }
     if (auth.type==='guest') {
       const check = await checkUsage(getSessionId());
-      if (!check.allowed) { setError('åè´¹æ¬¡æ°å·²ç¨å®'); return; }
+      if (!check.allowed) { setError('免费次数已用完'); return; }
     }
     const prompts = {
-      rewrite:'è¯·å¯¹ä»¥ä¸åå®¹è¿è¡å¨é¢æ¹ååä¼åï¼æåå¯è¯»æ§åå¸å¼åï¼ä¿æåæï¼\n',
-      title:'è¯·ä¸ºä»¥ä¸åå®¹çæ5ä¸ªæ´å¸å¼ç¼ççæ é¢ï¼\n',
-      seo:'è¯·ä¼åä»¥ä¸åå®¹çSEOï¼å¢å å³é®è¯å¯åº¦åå¯è¯»æ§ï¼\n',
-      short:'è¯·å°ä»¥ä¸åå®¹ç²¾ç®å°200å­ä»¥åï¼ä¿çæ ¸å¿ä¿¡æ¯ï¼\n',
-      emoji:'è¯·ç»ä»¥ä¸åå®¹éå½å å¥emojiï¼è®©åå®¹æ´æ´»æ³¼ï¼\n'
+      rewrite:'请对以下内容进行全面改写和优化，提升可读性和吸引力，保持原意：\n',
+      title:'请为以下内容生成5个更吸引眼球的标题：\n',
+      seo:'请优化以下内容的SEO，增加关键词密度和可读性：\n',
+      short:'请将以下内容精简到200字以内，保留核心信息：\n',
+      emoji:'请给以下内容适当加入emoji，让内容更活泼：\n'
     };
     setLoading(true); setError(''); setResult('');
     const keys = loadKeys();
     const provider = keys.provider || 'deepseek';
     const res = await callAI({ provider, model: keys[provider+'_model']||'deepseek-chat', apiKey: keys[provider+'_key']||'',
-      system:'ä½ æ¯ä¸ä¸çåå®¹ä¼åå©æï¼æé¿ä¼åä¸­æç¤¾åªåå®¹ã', user: prompts[mode]+original });
+      system:'你是专业的内容优化助手，擅长优化中文社媒内容。', user: prompts[mode]+original });
     setLoading(false);
     if (res.error) setError(res.error);
     else { setResult(res.content||res.text||''); if(auth.type==='guest'){onUsed();await recordUsage(getSessionId(),false,'optimize');} }
@@ -1139,32 +1258,32 @@ function OptimizePage({ auth, onUsed }) {
 
   return (
     <div style={{padding:24,maxWidth:960,margin:'0 auto'}}>
-      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>ð§ åå®¹ä¼å</h2>
-      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>ä½¿ç¨AIä¼åå·²æåå®¹</p>
+      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>🔧 内容优化</h2>
+      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>使用AI优化已有内容</p>
       <div style={{display:'flex',gap:6,marginBottom:16,flexWrap:'wrap'}}>
-        {[{v:'rewrite',l:'âï¸ å¨é¢æ¹å'},{v:'title',l:'ð æ é¢ä¼å'},{v:'seo',l:'ð SEOä¼å'},{v:'short',l:'âï¸ ç²¾ç®ç¼©ç­'},{v:'emoji',l:'ð æ·»å Emoji'}].map(({v,l})=>(
+        {[{v:'rewrite',l:'✍️ 全面改写'},{v:'title',l:'📌 标题优化'},{v:'seo',l:'🔍 SEO优化'},{v:'short',l:'✂️ 精简缩短'},{v:'emoji',l:'😊 添加Emoji'}].map(({v,l})=>(
           <div key={v} onClick={()=>setMode(v)} style={{padding:'6px 14px',borderRadius:8,cursor:'pointer',fontSize:13,fontWeight:500,border:'1.5px solid',borderColor:mode===v?'#6366f1':'#e2e8f0',background:mode===v?'#eef2ff':'#fff',color:mode===v?'#6366f1':'#64748b'}}>{l}</div>
         ))}
       </div>
       <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
         <div className="card" style={{padding:20}}>
-          <h4 style={{fontSize:14,fontWeight:600,marginBottom:10}}>åå§åå®¹</h4>
-          <textarea className="input-base" value={original} onChange={e=>setOriginal(e.target.value)} style={{minHeight:300,resize:'vertical'}} placeholder="ç²è´´éè¦ä¼åçåå®¹..." />
+          <h4 style={{fontSize:14,fontWeight:600,marginBottom:10}}>原始内容</h4>
+          <textarea className="input-base" value={original} onChange={e=>setOriginal(e.target.value)} style={{minHeight:300,resize:'vertical'}} placeholder="粘贴需要优化的内容..." />
           {error && <p style={{color:'#ef4444',fontSize:13,marginTop:8}}>{error}</p>}
           <button className="btn-primary" onClick={handleOptimize} disabled={loading} style={{width:'100%',padding:'9px',borderRadius:8,fontWeight:600,marginTop:12}}>
-            {loading?<><span className="spinner"/> <span style={{marginLeft:8}}>ä¼åä¸­...</span></>:'ð å¼å§ä¼å'}
+            {loading?<><span className="spinner"/> <span style={{marginLeft:8}}>优化中...</span></>:'🚀 开始优化'}
           </button>
         </div>
         <div className="card" style={{padding:20}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-            <h4 style={{fontSize:14,fontWeight:600,margin:0}}>ä¼åç»æ</h4>
-            {result && <button className="btn-secondary" style={{padding:'4px 12px',borderRadius:6,fontSize:12}} onClick={()=>navigator.clipboard?.writeText(result)}>å¤å¶</button>}
+            <h4 style={{fontSize:14,fontWeight:600,margin:0}}>优化结果</h4>
+            {result && <button className="btn-secondary" style={{padding:'4px 12px',borderRadius:6,fontSize:12}} onClick={()=>navigator.clipboard?.writeText(result)}>复制</button>}
           </div>
           {result ? (
             <textarea className="input-base" value={result} onChange={e=>setResult(e.target.value)} style={{minHeight:300,resize:'vertical'}} />
           ) : (
             <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:300,color:'#94a3b8',flexDirection:'column',gap:8}}>
-              <span style={{fontSize:40}}>ð§</span><span>ä¼åç»æå°å¨æ­¤æ¾ç¤º</span>
+              <span style={{fontSize:40}}>🔧</span><span>优化结果将在此显示</span>
             </div>
           )}
         </div>
@@ -1173,22 +1292,22 @@ function OptimizePage({ auth, onUsed }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Monetize Page
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function MonetizePage() {
   const STRATEGIES = [
-    {icon:'ð¼',title:'ç¥è¯ä»è´¹',desc:'ä¸æ è®¢éãè¯¾ç¨ãçµå­ä¹¦ã1v1å¨è¯¢',revenue:'âââââ',difficulty:'ä¸­'},
-    {icon:'ðï¸',title:'å¸¦è´§åç°',desc:'ååæ¨èãç´æ­å¸¦è´§ãèçè¥é',revenue:'ââââ',difficulty:'ä¸­'},
-    {icon:'ð¢',title:'å¹¿åæ¤å¥',desc:'è½¯å¹¿ãå¼å±å¹¿åãåçåä½',revenue:'âââ',difficulty:'ä½'},
-    {icon:'ð',title:'ç§åè¿è¥',desc:'ä»è´¹ç¤¾ç¾¤ãVIPä¼åãè®­ç»è¥',revenue:'âââââ',difficulty:'é«'},
-    {icon:'ð·ï¸',title:'IPææ',desc:'IPå¨è¾¹ãèååä½ãææä½¿ç¨',revenue:'âââ',difficulty:'é«'},
-    {icon:'ð¯',title:'æµéåç°',desc:'å¹¿ååæãäºæ¨ãå¹³å°æ¿å±',revenue:'ââ',difficulty:'ä½'},
+    {icon:'💼',title:'知识付费',desc:'专栏订阅、课程、电子书、1v1咨询',revenue:'★★★★★',difficulty:'中'},
+    {icon:'🛍️',title:'带货变现',desc:'商品推荐、直播带货、联盟营销',revenue:'★★★★',difficulty:'中'},
+    {icon:'📢',title:'广告植入',desc:'软广、开屏广告、品牌合作',revenue:'★★★',difficulty:'低'},
+    {icon:'💎',title:'私域运营',desc:'付费社群、VIP会员、训练营',revenue:'★★★★★',difficulty:'高'},
+    {icon:'🏷️',title:'IP授权',desc:'IP周边、联名合作、授权使用',revenue:'★★★',difficulty:'高'},
+    {icon:'🎯',title:'流量变现',desc:'广告分成、互推、平台激励',revenue:'★★',difficulty:'低'},
   ];
   return (
     <div style={{padding:24,maxWidth:900,margin:'0 auto'}}>
-      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>ð° åç°ç®¡ç</h2>
-      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>æ¢ç´¢åç®¡çåå®¹åç°ç­ç¥</p>
+      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>💰 变现管理</h2>
+      <p style={{color:'#64748b',fontSize:14,marginBottom:20}}>探索和管理内容变现策略</p>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))',gap:16}}>
         {STRATEGIES.map(s=>(
           <div key={s.title} className="card" style={{padding:20}}>
@@ -1196,8 +1315,8 @@ function MonetizePage() {
             <h4 style={{fontSize:16,fontWeight:700,marginBottom:6}}>{s.title}</h4>
             <p style={{color:'#64748b',fontSize:13,marginBottom:12}}>{s.desc}</p>
             <div style={{display:'flex',justifyContent:'space-between',fontSize:12}}>
-              <span style={{color:'#94a3b8'}}>æ¶çæ½åï¼<span style={{color:'#f59e0b'}}>{s.revenue}</span></span>
-              <span className="tag" style={{background:'#f1f5f9',color:'#64748b'}}>é¾åº¦ï¼{s.difficulty}</span>
+              <span style={{color:'#94a3b8'}}>收益潜力：<span style={{color:'#f59e0b'}}>{s.revenue}</span></span>
+              <span className="tag" style={{background:'#f1f5f9',color:'#64748b'}}>难度：{s.difficulty}</span>
             </div>
           </div>
         ))}
@@ -1206,34 +1325,34 @@ function MonetizePage() {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  APIs Page
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function ApisPage() {
   const [keys, setKeys] = useState(loadKeys);
   function update(k, v) { const n = {...keys,[k]:v}; setKeys(n); saveKeys(n); }
   return (
     <div style={{padding:24,maxWidth:760,margin:'0 auto'}}>
-      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>ð API éç½®</h2>
-      <p style={{color:'#64748b',fontSize:14,marginBottom:6}}>éç½® AI ææ¬çææéç API Keyï¼ä»ç¨äºæ¬å°æ¨¡å¼ï¼</p>
+      <h2 style={{fontSize:22,fontWeight:700,marginBottom:4}}>🔑 API 配置</h2>
+      <p style={{color:'#64748b',fontSize:14,marginBottom:6}}>配置 AI 文本生成所需的 API Key（仅用于本地模式）</p>
       <p style={{background:'#fef3c7',color:'#92400e',padding:'8px 12px',borderRadius:8,fontSize:13,marginBottom:20}}>
-        â ï¸ çäº§ç¯å¢ä¸­ï¼ææ API Key å·²å®å¨å­å¨å¨æå¡å¨ç¯å¢åéä¸­ï¼æ éå¨æ­¤éç½®ã
+        ⚠️ 生产环境中，所有 API Key 已安全存储在服务器环境变量中，无需在此配置。
       </p>
       <div className="card" style={{padding:24}}>
         <div style={{marginBottom:16}}>
-          <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>é»è®¤ AI æä¾å</label>
+          <label style={{fontSize:13,fontWeight:600,color:'#475569',display:'block',marginBottom:6}}>默认 AI 提供商</label>
           <select className="input-base" style={{maxWidth:220}} value={keys.provider||'deepseek'} onChange={e=>update('provider',e.target.value)}>
             <option value="deepseek">DeepSeek</option>
             <option value="openai">OpenAI</option>
             <option value="claude">Claude</option>
-            <option value="qwen">éä¹åé®</option>
+            <option value="qwen">通义千问</option>
           </select>
         </div>
         {[
-          {k:'deepseek_key',label:'DeepSeek API Key',ph:'sk-...'},{k:'deepseek_model',label:'DeepSeek æ¨¡å',ph:'deepseek-chat'},
-          {k:'openai_key',label:'OpenAI API Key',ph:'sk-...'},{k:'openai_model',label:'OpenAI æ¨¡å',ph:'gpt-4o'},
-          {k:'claude_key',label:'Claude API Key',ph:'sk-ant-...'},{k:'claude_model',label:'Claude æ¨¡å',ph:'claude-3-5-sonnet-20241022'},
-          {k:'qwen_key',label:'éä¹åé® API Key',ph:'sk-...'},{k:'qwen_model',label:'åé®æ¨¡å',ph:'qwen-max'},
+          {k:'deepseek_key',label:'DeepSeek API Key',ph:'sk-...'},{k:'deepseek_model',label:'DeepSeek 模型',ph:'deepseek-chat'},
+          {k:'openai_key',label:'OpenAI API Key',ph:'sk-...'},{k:'openai_model',label:'OpenAI 模型',ph:'gpt-4o'},
+          {k:'claude_key',label:'Claude API Key',ph:'sk-ant-...'},{k:'claude_model',label:'Claude 模型',ph:'claude-3-5-sonnet-20241022'},
+          {k:'qwen_key',label:'通义千问 API Key',ph:'sk-...'},{k:'qwen_model',label:'千问模型',ph:'qwen-max'},
         ].map(f=>(
           <div key={f.k} style={{marginBottom:12}}>
             <label style={{fontSize:13,color:'#475569',display:'block',marginBottom:5}}>{f.label}</label>
@@ -1246,23 +1365,23 @@ function ApisPage() {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Home Page
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function HomePage({ auth, onPage }) {
   const history = loadContentHistory();
   const recent = history.slice(0, 3);
   const QUICK_ACTIONS = [
-    {icon:'ð¡',label:'çæ§ç­é¨éé¢',page:'monitor',desc:'å®æ¶è¿½è¸ªå¾®ä¿¡/å°çº¢ä¹¦ç­ç¹'},
-    {icon:'ð­',label:'AI åå®¹åä½',page:'factory',desc:'ä¸é®çæçæ¬¾æç« '},
-    {icon:'ð¤',label:'åå¸ç®¡ç',page:'publish',desc:'ç®¡çå¹¶åå¸å°åå¹³å°'},
-    {icon:'ð',label:'æ°æ®åæ',page:'analytics',desc:'åæåå®¹è¡¨ç°æ°æ®'},
+    {icon:'📡',label:'监控热门选题',page:'monitor',desc:'实时追踪微信/小红书热点'},
+    {icon:'🏭',label:'AI 内容创作',page:'factory',desc:'一键生成爆款文章'},
+    {icon:'📤',label:'发布管理',page:'publish',desc:'管理并发布到各平台'},
+    {icon:'📊',label:'数据分析',page:'analytics',desc:'分析内容表现数据'},
   ];
   return (
     <div style={{padding:24,maxWidth:1000,margin:'0 auto'}}>
       <div style={{marginBottom:28}}>
-        <h2 style={{fontSize:26,fontWeight:800,marginBottom:4}} className="gradient-text">æ¬¢è¿åæ¥ ð</h2>
-        <p style={{color:'#64748b',fontSize:15}}>ä½ çå¨ååå®¹å·¥åï¼è®©åä½æ´é«æ</p>
+        <h2 style={{fontSize:26,fontWeight:800,marginBottom:4}} className="gradient-text">欢迎回来 👋</h2>
+        <p style={{color:'#64748b',fontSize:15}}>你的全域内容工厂，让创作更高效</p>
       </div>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:16,marginBottom:28}}>
         {QUICK_ACTIONS.map(a=>(
@@ -1278,7 +1397,7 @@ function HomePage({ auth, onPage }) {
       </div>
       {recent.length > 0 && (
         <div>
-          <h3 style={{fontSize:17,fontWeight:700,marginBottom:14}}>æè¿åä½</h3>
+          <h3 style={{fontSize:17,fontWeight:700,marginBottom:14}}>最近创作</h3>
           {recent.map(item=>(
             <div key={item.id} className="card" style={{padding:14,marginBottom:10,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div>
@@ -1287,24 +1406,24 @@ function HomePage({ auth, onPage }) {
                 <span className="tag" style={{background:'#f1f5f9',color:'#6366f1',marginLeft:8,fontSize:11}}>{item.platform}</span>
               </div>
               <button className="btn-secondary" style={{padding:'4px 12px',borderRadius:6,fontSize:12}}
-                onClick={()=>onPage('publish')}>æ¥ç</button>
+                onClick={()=>onPage('publish')}>查看</button>
             </div>
           ))}
         </div>
       )}
       {!IS_HOSTED && (
         <div style={{background:'#fef3c7',border:'1.5px solid #fde68a',borderRadius:12,padding:20,marginTop:20}}>
-          <h4 style={{fontSize:15,fontWeight:700,marginBottom:6,color:'#92400e'}}>â ï¸ æ¬å°æ¨¡å¼</h4>
-          <p style={{color:'#92400e',fontSize:13,margin:0}}>å½åå¨æ¬å°æ¨¡å¼ä¸è¿è¡ï¼é¨ååè½ï¼AIçæãçæ§æç´¢ãåå¸ï¼éè¦è®¿é®çº¿ä¸çæ¬ä½¿ç¨ãè®¿é®ï¼<a href="https://content-factory-beryl.vercel.app/factory.html" style={{color:'#6366f1'}}>content-factory-beryl.vercel.app</a></p>
+          <h4 style={{fontSize:15,fontWeight:700,marginBottom:6,color:'#92400e'}}>⚠️ 本地模式</h4>
+          <p style={{color:'#92400e',fontSize:13,margin:0}}>当前在本地模式下运行，部分功能（AI生成、监控搜索、发布）需要访问线上版本使用。访问：<a href="https://content-factory-beryl.vercel.app/factory.html" style={{color:'#6366f1'}}>content-factory-beryl.vercel.app</a></p>
         </div>
       )}
     </div>
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 //  Main App
-// âââââââââââââââââââââââââââââââââââââââââââââ
+// ─────────────────────────────────────────────
 function App() {
   const [auth, setAuth] = useState(()=>IS_HOSTED ? loadAuth() : {type:'owner',code:'local'});
   const [page, setPage] = useState('home');
